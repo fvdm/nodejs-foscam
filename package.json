@@ -1,0 +1,26 @@
+{
+  "author": "Franklin van de Meent <fr@nkl.in> (http://frankl.in)",
+  "name": "foscam",
+  "description": "Remote control, view and config a Foscam/Tenvis IP camera",
+  "version": "0.1.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/fvdm/nodejs-foscam.git"
+  },
+  "main": "foscam.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  },
+  "bugs": {
+    "url": "https://github.com/fvdm/nodejs-foscam/issues"
+  },
+  "tags": [
+    "foscam",
+    "tenvis",
+    "camera",
+    "ipcam"
+  ]
+}
