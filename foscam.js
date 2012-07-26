@@ -386,6 +386,11 @@ app.talk = function( props ) {
 		
 	})
 	
+	// fail
+	req.on( 'error', function( err ) {
+		app.emit( 'connection-error', err )
+	})
+	
 	// disconnect
 	req.end()
 	
