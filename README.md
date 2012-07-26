@@ -98,6 +98,34 @@ cam.setup(
 )
 ```
 
+## status
+### ( callback )
+
+Get basic details from the camera.
+
+```js
+cam.status( console.log )
+```
+```js
+{ id: '001A11A00A0B',
+  sys_ver: '0.37.2.36',
+  app_ver: '3.2.2.18',
+  alias: 'Cam1',
+  now: '1343304558',
+  tz: '-3600',
+  alarm_status: '0',
+  ddns_status: '0',
+  ddns_host: '',
+  oray_type: '0',
+  upnp_status: '0',
+  p2p_status: '0',
+  p2p_local_port: '23505',
+  msn_status: '0',
+  alarm_status_str: 'no alarm',
+  ddns_status_str: 'No Action',
+  upnp_status_str: 'No Action' }
+```
+
 # Unlicense
 
 This is free and unencumbered software released into the public domain.
