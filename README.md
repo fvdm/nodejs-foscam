@@ -127,6 +127,25 @@ cam.status( console.log )
   upnp_status_str: 'No Action' }
 ```
 
+## camera_params
+### ( callback )
+
+**Permission: visitor**
+
+Get camera sensor settings.
+
+```js
+cam.camera_params( console.log )
+```
+```js
+{ resolution: 32,
+  brightness: 96,
+  contrast: 4,
+  mode: 1,
+  flip: 0,
+  fps: 0 }
+```
+
 # Unlicense
 
 This is free and unencumbered software released into the public domain.
