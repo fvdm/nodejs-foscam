@@ -1,8 +1,10 @@
 # nodejs-foscam
 
-Remote control, view and config a Foscam/Tenvis IP camera
+Remote control, view and config a Foscam/Tenvis IP camera.
 
 # Usage
+
+The installation and loading are simple with [NPM](http://search.npmjs.org/).
 
 ```sh
 npm install foscam
@@ -25,7 +27,7 @@ cam.control.decoder( 'left', function() {
   cam.control.decoder( 'stop left', function() {
     
     // take a picture and store it on your computer
-    cam.snapshot( '/path/to/file.jpg', console.log )
+    cam.snapshot( '/path/to/save.jpg', console.log )
   
   })
   
