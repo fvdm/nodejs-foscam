@@ -146,6 +146,24 @@ cam.camera_params( console.log )
   fps: 0 }
 ```
 
+## snapshot
+### ( [filename], callback )
+
+Take a snapshot. Either receive the **binary JPEG** in the *callback* or specify a **filename** to store it on your computer.
+
+When a *filename* is provided the callback will return either the *filename* on success or *false* on faillure.
+
+```js
+// custom processing
+cam.snapshot( function( jpeg ) {
+	// add binary processing here
+})
+
+// store locally
+cam.snapshot( './my_view.jpg', console.log )
+```
+
+
 # Unlicense
 
 This is free and unencumbered software released into the public domain.
