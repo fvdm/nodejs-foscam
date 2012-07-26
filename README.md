@@ -34,6 +34,15 @@ cam.control.decoder( 'left', function() {
 })
 ```
 
+### Or directly from Github
+
+```sh
+git clone https://github.com/fvdm/nodejs-foscam.git
+```
+```js
+var cam = require('./nodejs-foscam/foscam.js')
+```
+
 # Unlicense
 
 This is free and unencumbered software released into the public domain.
