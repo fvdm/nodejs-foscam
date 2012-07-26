@@ -43,6 +43,12 @@ git clone https://github.com/fvdm/nodejs-foscam.git
 var cam = require('./nodejs-foscam/foscam.js')
 ```
 
+# Methods
+
+Every method takes a **callback** function as last parameter. The callbacks are the only way to procedural scripting.
+
+**NOTE:** Some methods require a certain access-level, i.e. *admins* can do everything, but a *visitor* can only view.
+
 # Unlicense
 
 This is free and unencumbered software released into the public domain.
