@@ -50,6 +50,9 @@ app.setup = function( props, cb ) {
 		app.settings[ key ] = props[ key ]
 	}
 	
+	if( typeof cb == 'function' ) {
+		app.status( cb )
+	}
 }
 
 
