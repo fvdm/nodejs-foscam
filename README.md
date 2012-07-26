@@ -100,6 +100,7 @@ cam.setup(
 
 ## status
 ### ( callback )
+**Permission: everyone**
 
 Get basic details from the camera.
 
