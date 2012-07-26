@@ -49,6 +49,55 @@ Every method takes a **callback** function as last parameter. The callbacks are 
 
 **NOTE:** Some methods require a certain access-level, i.e. *admins* can do everything, but a *visitor* can only view.
 
+## setup
+### ( properties, [callback] )
+
+In order to connect to the camera you first need to provide its access details. You can either do this by setting the properties below directly in **cam.settings**, but better is to use **cam.setup()**. When the **callback** function is provided, *setup()* will attempt to connect to the camera and retrieve its status, returned as object to the callback. When it fails the callback gets **false**.
+
+<table>
+	<th>key</th>
+	<th>description</th>
+	<th>default</th>
+	<tr>
+		<td>host</td>
+		<td>IP-address or hostname</td>
+		<td>192.168.1.239</td>
+	</tr>
+	<tr>
+		<td>port</td>
+		<td>port number</td>
+		<td>81</td>
+	</tr>
+	<tr>
+		<td>user</td>
+		<td>username</td>
+		<td>admin</td>
+	</tr>
+	<tr>
+		<td>pass</td>
+		<td>password</td>
+		<td>[empty]</td>
+	</tr>
+</table>
+
+```js
+cam.setup(
+	{
+		host: 'mycamera.lan',
+		port: 81,
+		user: 'admin'
+		pass: ''
+	},
+	function( status ) {
+		if( !status ) {
+			console.error( 'ERROR: can\'t connect' )
+		} else {
+			console.log( status )
+		}
+	}
+)
+```
+
 # Unlicense
 
 This is free and unencumbered software released into the public domain.
