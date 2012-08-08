@@ -155,7 +155,7 @@ app.preset = {
   },
   
   go: function( id, cb ) {
-    app.control.decoder( app.preset.id2cmd( set, id ), cb )
+    app.control.decoder( app.preset.id2cmd( 'go', id ), cb )
   }
 }
 
