@@ -163,6 +163,24 @@ cam.snapshot( function( jpeg ) {
 cam.snapshot( './my_view.jpg', console.log )
 ```
 
+## preset.set
+### ( id, [cb] )
+
+Save current camera position in preset #`id`.
+
+```js
+cam.preset.set( 3, console.log )
+```
+
+## preset.go
+### ( id, [cb] )
+
+Move camera to the position as stored in preset #`id`.
+
+```js
+cam.preset.go( 3, console.log )
+```
+
 
 # Unlicense
 
