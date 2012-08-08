@@ -2,9 +2,11 @@
 
 Remote control, view and config a Foscam/Tenvis IP camera.
 
+All included methods are based on Foscam's (fragmented) API documentation. Some features may not be supported by non-pan/tilt, older cameras or old firmware. So make sure you keep a backup of your camera settings, just in case.
+
 # Usage
 
-The installation and loading are simple with [NPM](http://search.npmjs.org/).
+The installation and loading are simple with [NPM](https://npmjs.org/).
 
 ```sh
 npm install foscam
@@ -40,22 +42,22 @@ cam.control.decoder( 'left', function() {
 git clone https://github.com/fvdm/nodejs-foscam.git
 ```
 ```js
-var cam = require('./nodejs-foscam/foscam.js')
+var cam = require('./nodejs-foscam')
 ```
 
 # Methods
 
-Every method takes a **callback** function as last parameter. The callbacks are the only way to procedural scripting.
+Every method takes a `callback` function as last parameter. The callbacks are the only way to procedural scripting.
 
 **NOTE:** Some methods require a certain access-level, i.e. *admins* can do everything, but a *visitor* can only view.
 
 ## setup
 ### ( properties, [callback] )
 
-In order to connect to the camera you first need to provide its access details. You can either do this by setting the properties below directly in **cam.settings**, but better is to use **cam.setup()**. When the **callback** function is provided, *setup()* will attempt to connect to the camera and retrieve its status, returned as object to the callback. When it fails the callback gets **false**.
+In order to connect to the camera you first need to provide its access details. You can either do this by setting the properties below directly in `cam.settings`, but better is to use `cam.setup()`. When the `callback` function is provided, `setup()` will attempt to connect to the camera and retrieve its status, returned as object to the callback. When it fails the callback gets **false**.
 
 <table>
-	<th>key</th>
+	<th>setting</th>
 	<th>description</th>
 	<th>default</th>
 	<tr>
@@ -149,9 +151,9 @@ cam.camera_params( console.log )
 ## snapshot
 ### ( [filename], callback )
 
-Take a snapshot. Either receive the **binary JPEG** in the *callback* or specify a **filename** to store it on your computer.
+Take a snapshot. Either receive the **binary JPEG** in the `callback` or specify a `filename` to store it on your computer.
 
-When a *filename* is provided the callback will return either the *filename* on success or *false* on faillure.
+When a `filename` is provided the callback will return either the *filename* on success or *false* on faillure.
 
 ```js
 // custom processing
@@ -166,7 +168,7 @@ cam.snapshot( './my_view.jpg', console.log )
 ## preset.set
 ### ( id, [cb] )
 
-Save current camera position in preset #`id`.
+Save current camera position in preset #`id`. You can set presets 1 to 16.
 
 ```js
 cam.preset.set( 3, console.log )
@@ -175,7 +177,7 @@ cam.preset.set( 3, console.log )
 ## preset.go
 ### ( id, [cb] )
 
-Move camera to the position as stored in preset #`id`.
+Move camera to the position as stored in preset #`id`. You can use presets 1 to 16.
 
 ```js
 cam.preset.go( 3, console.log )
