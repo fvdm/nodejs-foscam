@@ -140,6 +140,26 @@ app.camera_params = function( cb ) {
 }
 
 
+// Presets
+app.preset = {
+  id2cmd: function( action, id ) {
+    var cmds = {
+      set: [30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60],
+      go: [31,33,35,37,39,41,43,45,47,49,51,53,55,57,59,61]
+    }
+    return cmds[ action ][ id-1 ]
+  },
+  
+  set: function( id, cb ) {
+    app.control.decoder( app.preset.id2cmd( 'set', id ), cb )
+  },
+  
+  go: function( id, cb ) {
+    app.control.decoder( app.preset.id2cmd( 'go', id ), cb )
+  }
+}
+
+
 // control
 app.control = {
 	
