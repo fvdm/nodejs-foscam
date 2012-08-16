@@ -277,6 +277,98 @@ Control camera movement, like pan and tilt.
 	</tr>
 </table>
 
+## control.camera
+### ( name, value, [callback] )
+
+Change a camera (sensor) setting.
+
+**name** - the parameter *name* or *id*.
+**value** - its replacement value.
+
+###### Parameters
+
+<table>
+	<th>name</th>
+	<th>id</th>
+	<th>values</th>
+	<tr>
+		<td>brightness</td>
+		<td>1</td>
+		<td>0-255</td>
+	</tr>
+	<tr>
+		<td>contrast</td>
+		<td>2</td>
+		<td>0-6</td>
+	</tr>
+	<tr>
+		<td>resolution</td>
+		<td>0</td>
+		<td>
+			<table>
+				<th>value (aliases)</th>
+				<th>id</th>
+				<tr>
+					<td>320, 320x240, 320*240</td>
+					<td>8</td>
+				</tr>
+				<tr>
+					<td>640, 640x480, 640*480</td>
+					<td>32</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>mode</td>
+		<td>3</td>
+		<td>
+			<table>
+				<th>value (aliases)</th>
+				<th>id</th>
+				<tr>
+					<td>50, 50hz, 50 hz</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<td>60, 60hz, 60 hz</td>
+					<td>1</td>
+				</tr>
+				<tr>
+					<td>outdoor, outside</td>
+					<td>2</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>flipmirror</td>
+		<td>5</td>
+		<td>
+			<table>
+				<th>value (aliases)</th>
+				<th>id</th>
+				<tr>
+					<td>default</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<td>flip</td>
+					<td>1</td>
+				</tr>
+				<tr>
+					<td>mirror</td>
+					<td>2</td>
+				</tr>
+				<tr>
+					<td>flipmirror, flip+mirror</td>
+					<td>3</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+
 ## System
 
 
