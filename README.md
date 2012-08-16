@@ -51,6 +51,8 @@ Every method takes a `callback` function as last parameter. The callbacks are th
 
 **NOTE:** Some methods require a certain access-level, i.e. *admins* can do everything, but a *visitor* can only view.
 
+## Basic
+
 ## setup
 ### ( properties, [callback] )
 
@@ -148,6 +150,8 @@ cam.camera_params( console.log )
   fps: 0 }
 ```
 
+## Camera
+
 ## snapshot
 ### ( [filename], callback )
 
@@ -182,6 +186,8 @@ Move camera to the position as stored in preset #`id`. You can use presets 1 to 
 ```js
 cam.preset.go( 3, console.log )
 ```
+
+## System
 
 
 # Unlicense
