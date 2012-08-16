@@ -376,6 +376,11 @@ Change a camera (sensor) setting.
 
 Reboot the device
 
+## restore_factory
+### ( [callback ] )
+
+Reset all settings back to their factory values.
+
 
 # Unlicense
 
