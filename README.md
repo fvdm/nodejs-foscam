@@ -371,6 +371,11 @@ Change a camera (sensor) setting.
 
 ## System
 
+## reboot
+### ( [callback ] )
+
+Reboot the device
+
 
 # Unlicense
 
