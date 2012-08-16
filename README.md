@@ -187,6 +187,96 @@ Move camera to the position as stored in preset #`id`. You can use presets 1 to 
 cam.preset.go( 3, console.log )
 ```
 
+## control.decoder
+### ( command, [callback] )
+
+Control camera movement, like pan and tilt.
+
+**command** - The command to execute. This can be a string (see below) or number.
+
+###### Commands
+
+<table>
+	<th>command</th>
+	<th>api id</th>
+	<th>description</th>
+	<tr>
+		<td>up</td>
+		<td>0</td>
+		<td>start moving upwards</td>
+	</tr>
+	<tr>
+		<td>stop up</td>
+		<td>1</td>
+		<td>stop moving upwards</td>
+	</tr>
+	<tr>
+		<td>down</td>
+		<td>2</td>
+		<td>start moving downwards</td>
+	</tr>
+	<tr>
+		<td>stop down</td>
+		<td>3</td>
+		<td>stop moving downwards</td>
+	</tr>
+	<tr>
+		<td>left</td>
+		<td>4</td>
+		<td>start moving left</td>
+	</tr>
+	<tr>
+		<td>stop left</td>
+		<td>5</td>
+		<td>stop moving left</td>
+	</tr>
+	<tr>
+		<td>right</td>
+		<td>6</td>
+		<td>start moving right</td>
+	</tr>
+	<tr>
+		<td>stop right</td>
+		<td>7</td>
+		<td>stop moving right</td>
+	</tr>
+	<tr>
+		<td>center</td>
+		<td>25</td>
+		<td>move to center</td>
+	</tr>
+	<tr>
+		<td>vertical patrol</td>
+		<td>26</td>
+		<td>start moving vertical (y-axis)</td>
+	</tr>
+	<tr>
+		<td>stop vertical patrol</td>
+		<td>27</td>
+		<td>stop moving vertical (y-axis)</td>
+	</tr>
+	<tr>
+		<td>horizontal patrol</td>
+		<td>28</td>
+		<td>start moving horizontal (x-axis)</td>
+	</tr>
+	<tr>
+		<td>stop horizontal patrol</td>
+		<td>29</td>
+		<td>stop moving horizontal (x-axis)</td>
+	</tr>
+	<tr>
+		<td>io output high</td>
+		<td>94</td>
+		<td>iR on *(some cameras)*</td>
+	</tr>
+	<tr>
+		<td>io output low</td>
+		<td>95</td>
+		<td>iR off *(some cameras)*</td>
+	</tr>
+</table>
+
 ## System
 
 
