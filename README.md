@@ -381,6 +381,48 @@ Reboot the device
 
 Reset all settings back to their factory values.
 
+## talk
+### ( propsObject )
+
+Directly communicate with the device.
+
+###### properties
+
+<table>
+	<th>name</th>
+	<th>required</th>
+	<th>description</th>
+	<th>value</th>
+	<th>default</th>
+	<tr>
+		<td>path</td>
+		<td>required</td>
+		<td>the method path</td>
+		<td>ie. `get_params.cgi`</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>fields</td>
+		<td>optional</td>
+		<td>object with method parameters</td>
+		<td>ie. {ntp_enable: 1, ntp_svr: 'ntp.xs4all.nl'}
+		<td>{}</td>
+	</tr>
+	<tr>
+		<td>encoding</td>
+		<td>optional</td>
+		<td>response encoding to expect</td>
+		<td>ie. `utf8` or `binary`</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>callback</td>
+		<td>optional</td>
+		<td>(trimmed) output will be send to the callback *function*</td>
+		<td></td>
+		<td></td>
+	</tr>
+</table>
 
 # Unlicense
 
