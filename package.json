@@ -22,4 +22,8 @@
     "node":               "*"
   },
   "keywords":             ["foscam", "tenvis", "camera", "ipcam", "webcam"],
+  "license": {
+    "type":               "Public Domain",
+    "url":                "https://github.com/fvdm/nodejs-foscam/raw/master/UNLICENSE"
+  }
 }
