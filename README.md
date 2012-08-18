@@ -438,7 +438,7 @@ Directly communicate with the device.
 		<td>optional</td>
 		<td>response encoding to expect</td>
 		<td>ie. `utf8` or `binary`</td>
-		<td></td>
+		<td>utf8</td>
 	</tr>
 	<tr>
 		<td>callback</td>
