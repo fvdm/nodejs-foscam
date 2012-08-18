@@ -192,7 +192,7 @@ cam.preset.go( 3, console.log )
 
 Control camera movement, like pan and tilt.
 
-**command** - The command to execute. This can be a string (see below) or number.
+* **command** - The command to execute. This can be a string (see below) or number.
 
 ###### Commands
 
@@ -268,22 +268,29 @@ Control camera movement, like pan and tilt.
 	<tr>
 		<td>io output high</td>
 		<td>94</td>
-		<td>iR on *(some cameras)*</td>
+		<td>iR on <em>(some cameras)</em></td>
 	</tr>
 	<tr>
 		<td>io output low</td>
 		<td>95</td>
-		<td>iR off *(some cameras)*</td>
+		<td>iR off <em>(some cameras)</em></td>
 	</tr>
 </table>
+
+```js
+cam.control.decoder( 'horizontal patrol', function() {
+	console.log( 'Camera moving left-right' )
+})
+```
+
 
 ## control.camera
 ### ( name, value, [callback] )
 
 Change a camera (sensor) setting.
 
-**name** - the parameter *name* or *id*.
-**value** - its replacement value.
+* **name** - the parameter *name* or *id*.
+* **value** - its replacement value.
 
 ###### Parameters
 
@@ -369,6 +376,12 @@ Change a camera (sensor) setting.
 	</tr>
 </table>
 
+```js
+cam.control.camera( 'resolution', 640, function() {
+	console.log( 'Resolution changed to 640x480' )
+})
+```
+
 ## System
 
 ## reboot
@@ -376,10 +389,22 @@ Change a camera (sensor) setting.
 
 Reboot the device
 
+```js
+cam.reboot( function() {
+	console.log( 'Rebooting camera' )
+})
+```
+
 ## restore_factory
 ### ( [callback ] )
 
 Reset all settings back to their factory values.
+
+```js
+cam.restore_factory( function() {
+	console.log( 'Resetting camera settings to factory defaults' )
+})
+```
 
 ## talk
 ### ( propsObject )
@@ -418,11 +443,28 @@ Directly communicate with the device.
 	<tr>
 		<td>callback</td>
 		<td>optional</td>
-		<td>(trimmed) output will be send to the callback *function*</td>
+		<td>(trimmed) output will be send to the callback <em>function</em></td>
 		<td></td>
 		<td></td>
 	</tr>
 </table>
+
+```js
+cam.talk(
+	{
+		path: 'set_datetime.cgi',
+		fields: {
+			ntp_enable: 1,
+			ntp_svr: 'ntp.xs4all.nl',
+			tz: -3600
+		}
+	},
+	function( response ) {
+		console.log( response )
+	}
+) 
+```
+
 
 # Unlicense
 
