@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/fvdm/nodejs-foscam.png)](http://travis-ci.org/fvdm/nodejs-foscam)
 # nodejs-foscam
 
 Remote control, view and config a Foscam/Tenvis IP camera.
