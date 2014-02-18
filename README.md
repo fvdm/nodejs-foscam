@@ -18,7 +18,7 @@ var cam = require('foscam')
 cam.setup({
   host: 'mycamera.lan',
   port: 81,
-  user: 'admin'
+  user: 'admin',
   pass: ''
 })
 
