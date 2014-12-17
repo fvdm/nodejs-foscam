@@ -397,7 +397,9 @@ app.talk = function( props ) {
     response.on( 'end', function() {
 
       if( typeof props.callback == 'function' ) {
-        data = data.trim()
+        if( props.encoding !== 'binary' ) {
+          data = data.trim()
+        }
         props.callback( data )
       }
     })
