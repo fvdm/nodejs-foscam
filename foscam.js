@@ -390,7 +390,7 @@ app.talk = function( props ) {
   }, function( response ) {
 
     // response
-    response.setEncoding( props.encoding ? props.encoding : 'utf8' )
+    response.setEncoding( props.encoding || 'utf8' )
     var data = []
     var size = 0
 
