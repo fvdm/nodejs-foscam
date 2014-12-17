@@ -155,14 +155,14 @@ cam.camera_params( console.log )
 ## snapshot
 ### ( [filename], callback )
 
-Take a snapshot. Either receive the **binary JPEG** in the `callback` or specify a `filename` to store it on your computer.
+Take a snapshot. Either receive the **binary JPEG** [`Buffer`](http://nodejs.org/api/buffer.html) in the `callback` or specify a `filename` to store it on your computer.
 
 When a `filename` is provided the callback will return either the *filename* on success or *false* on faillure.
 
 ```js
 // custom processing
 cam.snapshot( function( jpeg ) {
-	// add binary processing here
+	// add binary Buffer processing here
 })
 
 // store locally

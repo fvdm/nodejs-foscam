@@ -352,9 +352,9 @@ app.snapshot = function( filepath, cb ) {
   app.talk({
     path: 'snapshot.cgi',
     encoding: 'binary',
-    callback: function( bin ) {
+    callback: function( buf ) {
       if( filepath ) {
-        fs.writeFile( filepath, bin, 'binary', function( err ) {
+        fs.writeFile( filepath, buf, 'binary', function( err ) {
           if( err ) {
             throw err
             cb( false )
@@ -391,14 +391,20 @@ app.talk = function( props ) {
 
     // response
     response.setEncoding( props.encoding ? props.encoding : 'utf8' )
-    var data = ''
+    var data = []
+    var size = 0
 
-    response.on( 'data', function( chunk ) { data += chunk })
+    response.on( 'data', function( chunk ) {
+      data.push( chunk )
+      size += chunk.length
+    })
+
     response.on( 'end', function() {
+      data = new Buffer.concat( data, size )
 
       if( typeof props.callback == 'function' ) {
         if( props.encoding !== 'binary' ) {
-          data = data.trim()
+          data = data.toString().trim()
         }
         props.callback( data )
       }
