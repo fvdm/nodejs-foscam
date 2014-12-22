@@ -352,18 +352,22 @@ app.snapshot = function( filepath, cb ) {
   app.talk({
     path: 'snapshot.cgi',
     encoding: 'binary',
-    callback: function( buf ) {
-      if( filepath ) {
-        fs.writeFile( filepath, buf, 'binary', function( err ) {
-          if( err ) {
-            throw err
+    callback: function( res ) {
+      if( res ) {
+        if( filepath ) {
+          var file = fs.createWriteStream( filepath, {encoding: 'binary'} )
+          file.on( 'error', function( err ) {
+            app.emit( 'write-error', err )
             cb( false )
-          } else {
+            throw err
+          })
+          file.on( 'finish', function() {
             cb( filepath )
-          }
-        })
-      } else {
-        cb( bin )
+          })
+          res.pipe( file )
+        } else {
+          cb( res )
+        }
       }
     }
   })
@@ -389,8 +393,14 @@ app.talk = function( props ) {
     method:   'GET'
   }, function( response ) {
 
-    // response
-    response.setEncoding( props.encoding || 'utf8' )
+    // readable stream
+    if( props.encoding === 'binary' ) {
+      props.setEncoding('binary')
+      props.callback( response )
+      return
+    }
+
+    // normal data
     var data = []
     var size = 0
 
@@ -400,14 +410,8 @@ app.talk = function( props ) {
     })
 
     response.on( 'end', function() {
-      data = new Buffer.concat( data, size )
-
-      if( typeof props.callback == 'function' ) {
-        if( props.encoding !== 'binary' ) {
-          data = data.toString().trim()
-        }
-        props.callback( data )
-      }
+      data = new Buffer.concat( data, size ).toString().trim()
+      props.callback( data )
     })
   })
 
@@ -418,7 +422,6 @@ app.talk = function( props ) {
 
   // disconnect
   req.end()
-
 }
 
 // ready
