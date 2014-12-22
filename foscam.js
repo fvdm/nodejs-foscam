@@ -395,7 +395,7 @@ app.talk = function( props ) {
 
     // readable stream
     if( props.encoding === 'binary' ) {
-      props.setEncoding('binary')
+      response.setEncoding('binary')
       props.callback( response )
       return
     }
