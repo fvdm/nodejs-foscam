@@ -19,7 +19,7 @@
   "devDependencies":      {},
   "optionalDependencies": {},
   "engines": {
-    "node":               "*"
+    "node":               ">=0.8.0"
   },
   "keywords":             ["foscam", "tenvis", "camera", "ipcam", "webcam"],
   "license": {
