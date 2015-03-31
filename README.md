@@ -65,18 +65,18 @@ pass | string |               | Password
 
 ```js
 cam.setup (
-	{
-		host: 'mycamera.lan',
-		port: 81,
-		user: 'admin'
-		pass: ''
-	},
-	function (status) {
-		if (!status) {
-			console.error ('ERROR: can\'t connect');		} else {
-			console.log (status);
-		}
-	}
+  {
+    host: 'mycamera.lan',
+    port: 81,
+    user: 'admin'
+    pass: ''
+  },
+  function (status) {
+    if (!status) {
+      console.error ('ERROR: can\'t connect');    } else {
+      console.log (status);
+    }
+  }
 );
 ```
 
@@ -143,7 +143,7 @@ When a `filename` is provided the callback will return either the *filename* on 
 ```js
 // custom processing
 cam.snapshot (function (jpeg) {
-	// add binary processing here
+  // add binary processing here
 });
 
 // store locally
@@ -200,7 +200,7 @@ io output low          | iR off _(some camera)_
 
 ```js
 cam.control.decoder ('horizontal patrol', function () {
-	console.log ('Camera moving left-right');
+  console.log ('Camera moving left-right');
 });
 ```
 
@@ -222,7 +222,7 @@ flipmirror | `default`, `flip`, `mirror` or `flipmirror`
 
 ```js
 cam.control.camera ('resolution', 640, function () {
-	console.log ('Resolution changed to 640x480');
+  console.log ('Resolution changed to 640x480');
 });
 ```
 
@@ -236,7 +236,7 @@ Reboot the device
 
 ```js
 cam.reboot (function () {
-	console.log ('Rebooting camera');
+  console.log ('Rebooting camera');
 });
 ```
 
@@ -248,7 +248,7 @@ Reset all settings back to their factory values.
 
 ```js
 cam.restore_factory (function () {
-	console.log ('Resetting camera settings to factory defaults');
+  console.log ('Resetting camera settings to factory defaults');
 });
 ```
 
@@ -269,17 +269,17 @@ callback | function | yes      | i.e. `function (err, res)`
 
 ```js
 cam.talk (
-	{
-		path: 'set_datetime.cgi',
-		fields: {
-			ntp_enable: 1,
-			ntp_svr: 'ntp.xs4all.nl',
-			tz: -3600
-		}
-	},
-	function (response) {
-		console.log (response);
-	}
+  {
+    path: 'set_datetime.cgi',
+    fields: {
+      ntp_enable: 1,
+      ntp_svr: 'ntp.xs4all.nl',
+      tz: -3600
+    }
+  },
+  function (response) {
+    console.log (response);
+  }
 );
 ```
 
