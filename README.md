@@ -1,116 +1,96 @@
-# nodejs-foscam
+# foscam
 
 Remote control, view and config a Foscam/Tenvis IP camera.
 
-All included methods are based on Foscam's (fragmented) API documentation. Some features may not be supported by non-pan/tilt, older cameras or old firmware. So make sure you keep a backup of your camera settings, just in case.
+All included methods are based on Foscam's (fragmented) API documentation.
+Some features may not be supported by non-pan/tilt, older cameras or old firmware.
+So make sure you keep a backup of your camera settings, just in case.
 
-# Usage
 
-The installation and loading are simple with [NPM](https://npmjs.org/).
-
-```sh
-npm install foscam
-```
+## Usage
 
 ```js
-var cam = require('foscam')
+var cam = require ('foscam');
 
-cam.setup({
+cam.setup ({
   host: 'mycamera.lan',
   port: 81,
   user: 'admin',
   pass: ''
-})
+});
 
 // start rotating left
-cam.control.decoder( 'left', function() {
-  
+cam.control.decoder ('left', function () {
+
   // stop rotation
-  cam.control.decoder( 'stop left', function() {
-    
+  cam.control.decoder ('stop left', function () {
+
     // take a picture and store it on your computer
-    cam.snapshot( '/path/to/save.jpg', console.log )
-  
-  })
-  
-})
+    cam.snapshot ('/path/to/save.jpg', console.log);
+
+  });
+});
 ```
 
-### Or directly from Github
 
-```sh
-git clone https://github.com/fvdm/nodejs-foscam.git
-```
-```js
-var cam = require('./nodejs-foscam')
-```
+## Installation
 
-# Methods
+Stable: `npm install foscam`
+
+Develop: `npm install fvdm/nodejs-foscam#develop`
+
+
+## Methods
 
 Every method takes a `callback` function as last parameter. The callbacks are the only way to procedural scripting.
 
 **NOTE:** Some methods require a certain access-level, i.e. *admins* can do everything, but a *visitor* can only view.
 
-## Basic
 
-## setup
-### ( properties, [callback] )
+### Basic
+
+### setup
+#### ( properties, [callback] )
 
 In order to connect to the camera you first need to provide its access details. You can either do this by setting the properties below directly in `cam.settings`, but better is to use `cam.setup()`. When the `callback` function is provided, `setup()` will attempt to connect to the camera and retrieve its status, returned as object to the callback. When it fails the callback gets **false**.
 
-<table>
-	<th>setting</th>
-	<th>description</th>
-	<th>default</th>
-	<tr>
-		<td>host</td>
-		<td>IP-address or hostname</td>
-		<td>192.168.1.239</td>
-	</tr>
-	<tr>
-		<td>port</td>
-		<td>port number</td>
-		<td>81</td>
-	</tr>
-	<tr>
-		<td>user</td>
-		<td>username</td>
-		<td>admin</td>
-	</tr>
-	<tr>
-		<td>pass</td>
-		<td>password</td>
-		<td>[empty]</td>
-	</tr>
-</table>
+
+name | type   | default       | description
+-----|--------|---------------|----------------------
+host | string | 192.168.1.239 | Camera IP or hostname
+port | number | 81            | Camera port number
+user | string | admin         | Username
+pass | string |               | Password
+
 
 ```js
-cam.setup(
+cam.setup (
 	{
 		host: 'mycamera.lan',
 		port: 81,
 		user: 'admin'
 		pass: ''
 	},
-	function( status ) {
-		if( !status ) {
-			console.error( 'ERROR: can\'t connect' )
-		} else {
-			console.log( status )
+	function (status) {
+		if (!status) {
+			console.error ('ERROR: can\'t connect');		} else {
+			console.log (status);
 		}
 	}
-)
+);
 ```
 
-## status
-### ( callback )
+### status
+#### ( callback )
+
 **Permission: everyone**
 
 Get basic details from the camera.
 
 ```js
-cam.status( console.log )
+cam.status (console.log);
 ```
+
 ```js
 { id: '001A11A00A0B',
   sys_ver: '0.37.2.36',
@@ -131,16 +111,17 @@ cam.status( console.log )
   upnp_status_str: 'No Action' }
 ```
 
-## camera_params
-### ( callback )
+### camera_params
+#### ( callback )
 
 **Permission: visitor**
 
 Get camera sensor settings.
 
 ```js
-cam.camera_params( console.log )
+cam.camera_params (console.log);
 ```
+
 ```js
 { resolution: 32,
   brightness: 96,
@@ -150,10 +131,10 @@ cam.camera_params( console.log )
   fps: 0 }
 ```
 
-## Camera
+### Camera
 
-## snapshot
-### ( [filename], callback )
+### snapshot
+#### ( [filename], callback )
 
 Take a snapshot. Either receive the **binary JPEG** in the `callback` or specify a `filename` to store it on your computer.
 
@@ -161,296 +142,133 @@ When a `filename` is provided the callback will return either the *filename* on 
 
 ```js
 // custom processing
-cam.snapshot( function( jpeg ) {
+cam.snapshot (function (jpeg) {
 	// add binary processing here
-})
+});
 
 // store locally
-cam.snapshot( './my_view.jpg', console.log )
+cam.snapshot ('./my_view.jpg', console.log);
 ```
 
-## preset.set
-### ( id, [cb] )
+
+### preset.set
+#### ( id, [cb] )
 
 Save current camera position in preset #`id`. You can set presets 1 to 16.
 
 ```js
-cam.preset.set( 3, console.log )
+cam.preset.set (3, console.log);
 ```
 
-## preset.go
-### ( id, [cb] )
+
+### preset.go
+#### ( id, [cb] )
 
 Move camera to the position as stored in preset #`id`. You can use presets 1 to 16.
 
 ```js
-cam.preset.go( 3, console.log )
+cam.preset.go (3, console.log);
 ```
 
-## control.decoder
-### ( command, [callback] )
+
+### control.decoder
+#### ( command, [callback] )
 
 Control camera movement, like pan and tilt.
 
-* **command** - The command to execute. This can be a string (see below) or number.
+The `command` to execute can be a string or number.
 
-###### Commands
 
-<table>
-	<th>command</th>
-	<th>api id</th>
-	<th>description</th>
-	<tr>
-		<td>up</td>
-		<td>0</td>
-		<td>start moving upwards</td>
-	</tr>
-	<tr>
-		<td>stop up</td>
-		<td>1</td>
-		<td>stop moving upwards</td>
-	</tr>
-	<tr>
-		<td>down</td>
-		<td>2</td>
-		<td>start moving downwards</td>
-	</tr>
-	<tr>
-		<td>stop down</td>
-		<td>3</td>
-		<td>stop moving downwards</td>
-	</tr>
-	<tr>
-		<td>left</td>
-		<td>4</td>
-		<td>start moving left</td>
-	</tr>
-	<tr>
-		<td>stop left</td>
-		<td>5</td>
-		<td>stop moving left</td>
-	</tr>
-	<tr>
-		<td>right</td>
-		<td>6</td>
-		<td>start moving right</td>
-	</tr>
-	<tr>
-		<td>stop right</td>
-		<td>7</td>
-		<td>stop moving right</td>
-	</tr>
-	<tr>
-		<td>center</td>
-		<td>25</td>
-		<td>move to center</td>
-	</tr>
-	<tr>
-		<td>vertical patrol</td>
-		<td>26</td>
-		<td>start moving vertical (y-axis)</td>
-	</tr>
-	<tr>
-		<td>stop vertical patrol</td>
-		<td>27</td>
-		<td>stop moving vertical (y-axis)</td>
-	</tr>
-	<tr>
-		<td>horizontal patrol</td>
-		<td>28</td>
-		<td>start moving horizontal (x-axis)</td>
-	</tr>
-	<tr>
-		<td>stop horizontal patrol</td>
-		<td>29</td>
-		<td>stop moving horizontal (x-axis)</td>
-	</tr>
-	<tr>
-		<td>io output high</td>
-		<td>94</td>
-		<td>iR on <em>(some cameras)</em></td>
-	</tr>
-	<tr>
-		<td>io output low</td>
-		<td>95</td>
-		<td>iR off <em>(some cameras)</em></td>
-	</tr>
-</table>
+command                | description
+-----------------------|------------------
+up                     | start moving up
+stop up                | stop moving up
+down                   | start moving down
+stop down              | stop moving down
+left                   | start moving left
+stop left              | stop moving left
+right                  | start moving right
+stop right             | stop moving right
+center                 | move to center
+vertical patrol        | start moving y-axis
+stop vertical patrol   | stop moving y-axis
+horizontal patrol      | start moving x-axis
+stop horizontal patrol | stop moving x-axis
+io output high         | iR on _(some cameras)_
+io output low          | iR off _(some camera)_
+
 
 ```js
-cam.control.decoder( 'horizontal patrol', function() {
-	console.log( 'Camera moving left-right' )
-})
+cam.control.decoder ('horizontal patrol', function () {
+	console.log ('Camera moving left-right');
+});
 ```
 
 
-## control.camera
-### ( name, value, [callback] )
+### control.camera
+#### ( name, value, [callback] )
 
 Change a camera (sensor) setting.
 
-* **name** - the parameter *name* or *id*.
-* **value** - its replacement value.
 
-###### Parameters
+name       | value
+-----------|-----------------------------------
+resolution | `240` (320x240) or `480` (640x480)
+brightness | `0` to `255`
+contrast   | `0` to `6`
+mode       | `50` Hz, `60` Hz or `outdoor`
+flipmirror | `default`, `flip`, `mirror` or `flipmirror`
 
-<table>
-	<th>name</th>
-	<th>id</th>
-	<th>values</th>
-	<tr>
-		<td>brightness</td>
-		<td>1</td>
-		<td>0-255</td>
-	</tr>
-	<tr>
-		<td>contrast</td>
-		<td>2</td>
-		<td>0-6</td>
-	</tr>
-	<tr>
-		<td>resolution</td>
-		<td>0</td>
-		<td>
-			<table>
-				<th>value (aliases)</th>
-				<th>id</th>
-				<tr>
-					<td>320, 320x240, 320*240</td>
-					<td>8</td>
-				</tr>
-				<tr>
-					<td>640, 640x480, 640*480</td>
-					<td>32</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>mode</td>
-		<td>3</td>
-		<td>
-			<table>
-				<th>value (aliases)</th>
-				<th>id</th>
-				<tr>
-					<td>50, 50hz, 50 hz</td>
-					<td>0</td>
-				</tr>
-				<tr>
-					<td>60, 60hz, 60 hz</td>
-					<td>1</td>
-				</tr>
-				<tr>
-					<td>outdoor, outside</td>
-					<td>2</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>flipmirror</td>
-		<td>5</td>
-		<td>
-			<table>
-				<th>value (aliases)</th>
-				<th>id</th>
-				<tr>
-					<td>default</td>
-					<td>0</td>
-				</tr>
-				<tr>
-					<td>flip</td>
-					<td>1</td>
-				</tr>
-				<tr>
-					<td>mirror</td>
-					<td>2</td>
-				</tr>
-				<tr>
-					<td>flipmirror, flip+mirror</td>
-					<td>3</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-</table>
 
 ```js
-cam.control.camera( 'resolution', 640, function() {
-	console.log( 'Resolution changed to 640x480' )
-})
+cam.control.camera ('resolution', 640, function () {
+	console.log ('Resolution changed to 640x480');
+});
 ```
 
-## System
 
-## reboot
-### ( [callback ] )
+### System
+
+### reboot
+#### ( [callback ] )
 
 Reboot the device
 
 ```js
-cam.reboot( function() {
-	console.log( 'Rebooting camera' )
-})
+cam.reboot (function () {
+	console.log ('Rebooting camera');
+});
 ```
 
-## restore_factory
-### ( [callback ] )
+
+### restore_factory
+#### ( [callback ] )
 
 Reset all settings back to their factory values.
 
 ```js
-cam.restore_factory( function() {
-	console.log( 'Resetting camera settings to factory defaults' )
-})
+cam.restore_factory (function () {
+	console.log ('Resetting camera settings to factory defaults');
+});
 ```
 
-## talk
-### ( propsObject )
+
+### talk
+#### ( propsObject )
 
 Directly communicate with the device.
 
-###### properties
 
-<table>
-	<th>name</th>
-	<th>required</th>
-	<th>description</th>
-	<th>value</th>
-	<th>default</th>
-	<tr>
-		<td>path</td>
-		<td>required</td>
-		<td>the method path</td>
-		<td>ie. `get_params.cgi`</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td>fields</td>
-		<td>optional</td>
-		<td>object with method parameters</td>
-		<td>ie. {ntp_enable: 1, ntp_svr: 'ntp.xs4all.nl'}
-		<td>{}</td>
-	</tr>
-	<tr>
-		<td>encoding</td>
-		<td>optional</td>
-		<td>response encoding to expect</td>
-		<td>ie. `utf8` or `binary`</td>
-		<td>utf8</td>
-	</tr>
-	<tr>
-		<td>callback</td>
-		<td>optional</td>
-		<td>(trimmed) output will be send to the callback <em>function</em></td>
-		<td></td>
-		<td></td>
-	</tr>
-</table>
+property | type     | required | value
+---------|----------|----------|----------------------
+path     | string   | yes      | i.e. `get_params.cgi`
+fields   | object   | no       | i.e. `{ntp_enable: 1, ntp_svr: 'ntp.xs4all.nl'}`
+encoding | string   | no       | `binary` or `utf8` (default)
+callback | function | yes      | i.e. `function (err, res)`
+
 
 ```js
-cam.talk(
+cam.talk (
 	{
 		path: 'set_datetime.cgi',
 		fields: {
@@ -459,14 +277,14 @@ cam.talk(
 			tz: -3600
 		}
 	},
-	function( response ) {
-		console.log( response )
+	function (response) {
+		console.log (response);
 	}
-) 
+);
 ```
 
 
-# Unlicense
+## Unlicense
 
 This is free and unencumbered software released into the public domain.
 
@@ -492,3 +310,10 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 For more information, please refer to <http://unlicense.org/>
+
+
+## Author
+
+Franklin van de Meent
+| [Website](https://frankl.in)
+| [Github](https://github.com/fvdm)
