@@ -23,7 +23,7 @@
     "istanbul": "^0.4.4"
   },
   "scripts": {
-    "test": "bash test.js"
+    "test": "bash test.sh"
   },
   "engines": {
     "node": ">=0.12.0"
