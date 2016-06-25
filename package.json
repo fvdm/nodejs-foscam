@@ -16,7 +16,12 @@
   },
   "main": "foscam.js",
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "coveralls": "^2.11.9",
+    "dotest": "^1.12.4",
+    "eslint": "^2.13.1",
+    "istanbul": "^0.4.4"
+  },
   "engines": {
     "node": ">=0.12.0"
   },
