@@ -35,4 +35,24 @@ dotest.add ('Module', function (test) {
     .done ();
 });
 
+
+dotest.add ('Method .system.status', function (test) {
+  foscam.system.status (function t (err, data) {
+    test (err)
+      .isObject ('fail', 'data', data)
+      .isString ('fail', 'data.id', data && data.id)
+      .isNumber ('fail', 'data.alarm_status', data && data.alarm_status)
+      .isString ('fail', 'data.alarm_status_str', data && data.alarm_status_str)
+      .isNotEmpty ('fail', 'data.alarm_status_str', data && data.alarm_status_str)
+      .isNumber ('fail', 'data.ddns_status', data && data.ddns_status)
+      .isString ('fail', 'data.ddns_status_str', data && data.ddns_status_str)
+      .isNotEmpty ('fail', 'data.alarm_status_str', data && data.alarm_status_str)
+      .isNumber ('fail', 'data.upnp_status', data && data.upnp_status)
+      .isString ('fail', 'data.upnp_status_str', data && data.upnp_status_str)
+      .isNotEmpty ('fail', 'data.alarm_status_str', data && data.alarm_status_str)
+      .done ();
+  });
+});
+
+
 dotest.run ();
