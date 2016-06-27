@@ -15,7 +15,9 @@
     "url": "https://github.com/fvdm/nodejs-foscam/issues"
   },
   "main": "foscam.js",
-  "dependencies": {},
+  "dependencies": {
+    "httpreq": "^0.4.22"
+  },
   "devDependencies": {
     "coveralls": "^2.11.9",
     "dotest": "^1.12.4",
