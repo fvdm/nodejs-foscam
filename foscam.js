@@ -8,383 +8,386 @@ Feedback:       https://github.com/fvdm/nodejs-foscam/issues
 License:        Unlicense (public domain) - see LICENSE file
 */
 
-var http = require ('http');
-var querystring = require ('querystring');
+var httpreq = require ('httpreq');
 var fs = require ('fs');
-var EventEmitter = require ('events') .EventEmitter;
-var app = new EventEmitter;
 
 // defaults
-app.settings = {
-  host: '192.168.1.239',
-  port: 81,
-  user: 'admin',
-  pass: ''
+var config = {
+  endpoint: 'http://192.168.1.239:81',
+  username: 'admin',
+  password: '',
+  timeout: 5000
 };
 
-// overrides
-app.setup = function (props, cb) {
-  for (var key in props) {
-    app.settings [key] = props [key];
+
+/**
+ * Process httpreq response for callback
+ *
+ * @callback callback
+ * @param err {Error, null} - httpreq error
+ * @param res {object} - httpreq response details
+ * @param callback {function} - `function (err, data) (}`
+ * @returns {void}
+ */
+
+function httpResponse (err, res, callback) {
+  var data = res && res.body || '';
+  var error = null;
+
+  if (err) {
+    error = new Error ('request failed');
+    error.error = err;
+
+    callback (error);
+    return;
   }
 
-  if (typeof cb == 'function') {
-    app.status (cb);
+  data = data.trim ();
+
+  if (res.statusCode >= 300) {
+    error = new Error ('api error');
+    error.code = res.statusCode;
+    error.error = data;
+
+    callback (error);
+    return;
   }
-};
+
+  callback (null, data);
+}
 
 
-// status
-app.status = function (cb) {
-  app.talk ({
-    path: 'get_status.cgi',
-    callback: function (data) {
-      var result = {};
-      data = data.split ('\n');
-      for (var d in data) {
-        if (data[d] != '') {
-          var line = data[d].split ('var ');
-          line = String (line[1]).split ('=');
-          line[1] = String (line[1]).replace (/;$/, '');
-          result [line[0]] = line[1].substr (0,1) == '\'' ? line[1].substr (1, line[1].length -2) : line[1];
-        }
-      }
+/**
+ * Send HTTP request
+ *
+ * @callback callback
+ * @param [props.method = GET] {string} - GET, POST, etc
+ * @param props.path {string} - Path after `endpoint`
+ * @param [props.params] {object} - GET or POST parameters
+ * @param [props.timeout = config.timeout] {number} - Wait timeout in ms
+ * @param [props.endpoint = config.endpoint] {string} - Override API endpoint
+ * @params callback {function} - `function (err, data) {}`
+ * @returns {void}
+ */
 
-      if (result.alarm_status) {
-        switch (result.alarm_status) {
-          case '0': result.alarm_status_str = 'no alarm'; break;
-          case '1': result.alarm_status_str = 'motion alarm'; break;
-          case '2': result.alarm_status_str = 'input alarm'; break;
-        }
-      }
+function httpRequest (props, callback) {
+  var options = {
+    url: (props.endpoint || config.endpoint) + props.path,
+    method: props.method || 'GET',
+    parameters: props.params || null,
+    binary: props.binary || null,
+    timeout: props.timeout || config.timeout,
+    auth: config.username + ':' + config.password
+  };
 
-      if (result.ddns_status) {
-        switch (result.ddns_status) {
-          case '0': result.ddns_status_str = 'No Action'; break;
-          case '1': result.ddns_status_str = 'It\'s connecting...'; break;
-          case '2': result.ddns_status_str = 'Can\'t connect to the Server'; break;
-          case '3': result.ddns_status_str = 'Dyndns Succeed'; break;
-          case '4': result.ddns_status_str = 'DynDns Failed: Dyndns.org Server Error'; break;
-          case '5': result.ddns_status_str = 'DynDns Failed: Incorrect User or Password'; break;
-          case '6': result.ddns_status_str = 'DynDns Failed: Need Credited User'; break;
-          case '7': result.ddns_status_str = 'DynDns Failed: Illegal Host Format'; break;
-          case '8': result.ddns_status_str = 'DynDns Failed: The Host Does not Exist'; break;
-          case '9': result.ddns_status_str = 'DynDns Failed: The Host Does not Belong to You'; break;
-          case '10': result.ddns_status_str = 'DynDns Failed: Too Many or Too Few Hosts'; break;
-          case '11': result.ddns_status_str = 'DynDns Failed: The Host is Blocked for Abusing'; break;
-          case '12': result.ddns_status_str = 'DynDns Failed: Bad Reply from Server'; break;
-          case '13': result.ddns_status_str = 'DynDns Failed: Bad Reply from Server'; break;
-          case '14': result.ddns_status_str = 'Oray Failed: Bad Reply from Server'; break;
-          case '15': result.ddns_status_str = 'Oray Failed: Incorrect User or Password'; break;
-          case '16': result.ddns_status_str = 'Oray Failed: Incorrect Hostname'; break;
-          case '17': result.ddns_status_str = 'Oray Succeed'; break;
-          case '18': result.ddns_status_str = 'Reserved'; break;
-          case '19': result.ddns_status_str = 'Reserved'; break;
-          case '20': result.ddns_status_str = 'Reserved'; break;
-          case '21': result.ddns_status_str = 'Reserved'; break;
-        }
-      }
+  function processResponse (err, res) {
+    httpResponse (err, res, callback);
+  }
 
-      if (result.upnp_status) {
-        switch (result.upnp_status) {
-          case '0': result.upnp_status_str = 'No Action'; break;
-          case '1': result.upnp_status_str = 'Succeed'; break;
-          case '2': result.upnp_status_str = 'Device System Error'; break;
-          case '3': result.upnp_status_str = 'Errors in Network Communication'; break;
-          case '4': result.upnp_status_str = 'Errors in Chat with UPnP Device'; break;
-          case '5': result.upnp_status_str = 'Rejected by UPnP Device, Maybe Port Conflict'; break;
-        }
-      }
-
-      cb (result);
-    }
-  });
-};
+  httpreq.doRequest (options, processResponse);
+}
 
 
-// camera params
-app.camera_params = function (cb) {
-  app.talk ({
-    path: 'get_camera_params.cgi',
-    callback: function (data) {
-      var result = {}
-      data.replace (/var ([^=]+)=([^;]+);/g, function (str, key, value) {
-        result [key] = parseInt (value);
+/**
+ * Parse parameters from camera response
+ *
+ * @param data {string} - Text response from camera
+ * @returns {object} - Parsed parameters
+ */
+
+function parseParams (data) {
+  var result = {};
+  var i;
+
+  data = data.split ('\n');
+
+  for (i = 0; i < data.length; i++) {
+    if (data [i]) {
+      data [i].replace (/^var ([^=]+)=([^;]*);/g, function (str, key, val) {
+        result [key] = val.replace (/^((\d+)|'([^']*)')$/, function (str2, match, number, string) {
+          if (number) {
+            return parseInt (number, 10);
+          }
+
+          return string;
+        });
       });
-      cb (result);
     }
-  });
-};
+  }
+
+  return result;
+}
+
+
+/**
+ * Get camera status
+ *
+ * @callback callback
+ * @param callback {function} - `function (err, data) {}`
+ * @returns {void}
+ */
+
+function systemStatus (callback) {
+  function doCallback (err, data) {
+    var result = {};
+
+    var alarmStates = [
+      'No alarm',
+      'Motion alarm',
+      'Input alarm'
+    ];
+
+    var ddnsStates = [
+      'No action',
+      'Connecting...',
+      'Cannot connect to the server',
+      'Dyndns succeed',
+      'DynDns failed: Dyndns.org server error',
+      'DynDns failed: Incorrect user or password',
+      'DynDns failed: Need credited user',
+      'DynDns failed: Illegal host format',
+      'DynDns failed: Host does not exist',
+      'DynDns failed: Host does not belong to you',
+      'DynDns failed: Too many or too few hosts',
+      'DynDns failed: Host is blocked for abusing',
+      'DynDns failed: Bad Reply from Server',
+      'DynDns failed: Bad Reply from Server',
+      'Oray failed: Bad reply from server',
+      'Oray failed: Incorrect user or password',
+      'Oray failed: Incorrect hostname',
+      'Oray succeed',
+      'Reserved',
+      'Reserved',
+      'Reserved',
+      'Reserved'
+    ];
+
+    var upnpStates = [
+      'No action',
+      'Succeed',
+      'Device system error',
+      'Errors in network communication',
+      'Errors in chat with UPnP device',
+      'Rejected by UPnP device, maybe port conflict'
+    ];
+
+    if (err) {
+      callback (err);
+      return;
+    }
+
+    result = parseParams (data);
+    result.alarm_status = parseInt (result.alarm_status, 10);
+    result.alarm_status_str = alarmStates [result.alarm_status] || '';
+    result.ddns_status = parseInt (result.ddns_status, 10);
+    result.ddns_status_str = ddnsStates [result.ddns_status] || '';
+    result.upnp_status = parseInt (result.upnp_status, 10);
+    result.upnp_status_str = upnpStates [result.upnp_status] || '';
+
+    callback (null, result);
+  }
+
+  httpRequest ({ path: '/get_status.cgi' }, doCallback);
+}
+
+// pan/tilt
+function controlPTZ (cmd, callback) {
+  var commands = {
+    'up': 0,
+    'stop up': 1,
+    'down': 2,
+    'stop down': 3,
+    'left': 4,
+    'stop left': 5,
+    'right': 6,
+    'stop right': 7,
+    'center': 25,
+    'vertical patrol': 26,
+    'stop vertical patrol': 27,
+    'horizontal patrol': 28,
+    'stop horizontal patrol': 29,
+    'io output high': 94,
+    'io output low': 95
+  };
+
+  var options = {
+    path: '/decoder_control.cgi',
+    params: {
+      command: commands [cmd] || cmd
+    }
+  };
+
+  httpRequest (options, callback);
+}
 
 
 // Presets
-app.preset = {
-  id2cmd: function (action, id) {
-    var cmds = {
-      set: [30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60],
-      go: [31,33,35,37,39,41,43,45,47,49,51,53,55,57,59,61]
+function preset2cmd (action, presetId) {
+  var cmds = {
+    set: [30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60],
+    go: [31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61]
+  };
+
+  return cmds [action] [presetId - 1];
+}
+
+function controlStorePreset (id, callback) {
+  controlPTZ (preset2cmd ('set', id), callback);
+}
+
+function controlGotoPreset (id, callback) {
+  controlPTZ (preset2cmd ('go', id), callback);
+}
+
+
+// alias
+function configAlias (alias, callback) {
+  var options = {
+    path: '/set_alias.cgi',
+    params: {
+      alias: alias
     }
-    return cmds [action] [id-1];
-  },
+  };
 
-  set: function (id, cb) {
-    app.control.decoder (app.preset.id2cmd ('set', id), cb);
-  },
+  httpRequest (options, callback);
+}
 
-  go: function (id, cb) {
-    app.control.decoder (app.preset.id2cmd ('go', id), cb);
+// datetime
+function configDatetime (params, callback) {
+  var options = {
+    path: '/set_datetime.cgi',
+    params: params
+  };
+
+  httpRequest (options, callback);
+}
+
+// restore factory
+function configFactoryRestore (callback) {
+  httpRequest ({ path: '/restore_factory.cgi' }, callback);
+}
+
+
+// camera settings
+function configVideo (param, value, callback) {
+  var params = {
+    resolution: 0,
+    brightness: 1,
+    contrast: 2,
+    mode: 3,
+    flipmirror: 5
+  };
+
+  var values = {
+    '240p': 8,
+    '480p': 32,
+    '50hz': 0,
+    '60hz': 1,
+    'outdoor': 2,
+    'default': 0,
+    'flip': 1,
+    'mirror': 2,
+    'flipmirror': 3
+  };
+
+  var options = {
+    path: '/camera_control.cgi',
+    params: {
+      param: params [param] || param,
+      value: values [value] || value
+    }
+  };
+
+  // Only get config
+  if (typeof param === 'function') {
+    options.path = '/get_params.cgi';
+    options.params = null;
+    httpRequest (options, callback);
+    return;
   }
-};
 
-
-// control
-app.control = {
-
-  // pan/tilt
-  decoder: function (cmd, cb) {
-
-    if (typeof cmd == 'string' && !cmd.match (/^[0-9]+$/)) {
-      switch (cmd) {
-        case 'up': cmd = 0; break;
-        case 'stop up': cmd = 1; break;
-        case 'down': cmd = 2; break;
-        case 'stop down': cmd = 3; break;
-        case 'left': cmd = 4; break;
-        case 'stop left': cmd = 5; break;
-        case 'right': cmd = 6; break;
-        case 'stop right': cmd = 7; break;
-        case 'center': cmd = 25; break;
-        case 'vertical patrol': cmd = 26; break;
-        case 'stop vertical patrol': cmd = 27; break;
-        case 'horizontal patrol': cmd = 28; break;
-        case 'stop horizontal patrol': cmd = 29; break;
-        case 'io output high': cmd = 94; break;
-        case 'io output low': cmd = 95; break;
-      }
-    }
-
-    app.talk ({
-      path: 'decoder_control.cgi',
-      fields: { command: cmd },
-      callback: cb
-    });
-  },
-
-  // camera settings
-  camera: function (param, value, cb) {
-
-    // fix param
-    if (typeof param == 'string' && !param.match (/^[0-9]+$/)) {
-      switch (param) {
-
-        case 'brightness': param = 1; break;
-        case 'contrast': param = 2; break;
-
-        // resolution
-        case 'resolution':
-          param = 0;
-          if (typeof value == 'string' && !value.match (/^[0-9]{1,2}$/)) {
-            switch (value) {
-              case '320':
-              case '320x240':
-              case '320*240':
-                value = 8;
-                break;
-
-              case '640':
-              case '640x480':
-              case '640*480':
-                value = 32;
-                break;
-            }
-          }
-          break;
-
-        case 'mode':
-          param = 3;
-          if (typeof value == 'string' && !value.match (/^[0-9]$/)) {
-            switch (value.toLowerCase ()) {
-              case '50':
-              case '50hz':
-              case '50 hz':
-                value = 0;
-                break;
-
-              case '60':
-              case '60hz':
-              case '60 hz':
-                value = 1;
-                break;
-
-              case 'outdoor':
-              case 'outside':
-                value = 2;
-                break;
-            }
-          }
-          break;
-
-        case 'flipmirror':
-          param = 5;
-          if (typeof value == 'string' && !value.match (/^[0-9]$/)) {
-            switch (value.toLowerCase ()) {
-              case 'default':
-                value = 0;
-                break;
-
-              case 'flip':
-                value = 1;
-                break;
-
-              case 'mirror':
-                value = 2;
-                break;
-
-              case 'flipmirror':
-              case 'flip&mirror':
-              case 'flip+mirror':
-              case 'flip + mirror':
-              case 'flip & mirror':
-                value = 3;
-                break;
-            }
-          }
-          break;
-      }
-    }
-
-    // send it
-    app.talk ({
-      path: 'camera_control.cgi',
-      fields: {
-        param: param,
-        value: value
-      },
-      callback: cb
-    });
-  }
-};
+  // Change config
+  httpRequest (options, callback);
+}
 
 
 // reboot
-app.reboot = function (cb) {
-  app.talk ({
-    path: 'reboot.cgi',
-    callback: cb
-  });
-};
-
-
-// restore factory
-app.restore_factory = function (cb) {
-  app.talk ({
-    path: 'restore_factory.cgi',
-    callback: cb
-  });
-};
-
-
-// params
-app.params = function (cb) {
-  app.talk ({
-    path: 'get_params.cgi',
-    callback: cb
-  });
-};
-
-
-// set
-app.set = {
-
-  // alias
-  alias: function (alias, cb) {
-    app.talk ({
-      path: 'set_alias.cgi',
-      fields: { alias: alias },
-      callback: cb
-    });
-  },
-
-  // datetime
-  datetime: function (props, cb) {
-    app.talk ({
-      path: 'set_datetime.cgi',
-      fields: props,
-      callback: cb
-    });
-  }
-};
+function systemReboot (callback) {
+  httpRequest ({ path: '/reboot.cgi' }, callback);
+}
 
 
 // snapshot
-app.snapshot = function (filepath, cb) {
-  if (!cb && typeof filepath == 'function') {
-    var cb = filepath;
-    var filepath = false;
+function controlSnapshot (filepath, callback) {
+  var options = {
+    path: '/snapshot.cgi',
+    binary: true
+  };
+
+  if (typeof filepath === 'function') {
+    callback = filepath;
+    filepath = null;
   }
 
-  app.talk ({
-    path: 'snapshot.cgi',
-    encoding: 'binary',
-    callback: function (bin) {
-      if (filepath) {
-        fs.writeFile (filepath, bin, 'binary', function (err) {
-          if (err) {
-            throw err;
-            cb (false);
-          } else {
-            cb (filepath);
-          }
-        });
-      } else {
-        cb (bin);
-      }
+  httpRequest (options, function processSnapshot (err, data) {
+    if (err) {
+      callback (err);
+      return;
     }
+
+    if (filepath) {
+      fs.writeFile (filepath, data, 'binary', function (writeErr) {
+        if (writeErr) {
+          callback (writeErr);
+          return;
+        }
+
+        callback (null, filepath);
+      });
+
+      return;
+    }
+
+    callback (null, data);
   });
-};
+}
 
 
-// communicate
-app.talk = function (props) {
+/**
+ * Module interface & config
+ *
+ * @param [set] {object} - Configuration params
+ * @param [set.endpoint = http://192.168.1.239:81] {string} - URL to camera web UI
+ * @param [set.timeout = 5000] {number} - Request timeout in ms
+ * @param [set.username = admin] {string} - Camera username
+ * @param [set.password] {string} - Camera password
+ * @returns {object} - Interface methods
+ */
 
-  if (!props.fields) {
-    props.fields = {}
-  }
+function setup (set) {
+  config.endpoint = set.endpoint || config.endpoint;
+  config.username = set.username || config.username;
+  config.password = set.password || config.password;
+  config.timeout = set.timeout || config.timeout;
 
-  props.fields.user = app.settings.user;
-  props.fields.pwd = app.settings.pass;
-  path = '/'+ props.path +'?'+ querystring.stringify (props.fields);
+  return {
+    config: {
+      alias: configAlias,
+      datetime: configDatetime,
+      factoryRestore: configFactoryRestore,
+      video: configVideo
+    },
+    control: {
+      gotoPreset: controlGotoPreset,
+      storePreset: controlStorePreset,
+      snapshot: controlSnapshot,
+      ptz: controlPTZ
+    },
+    system: {
+      reboot: systemReboot,
+      status: systemStatus
+    }
+  };
+}
 
-  // connect
-  var req = http.request ({
-    host: app.settings.host,
-    port: app.settings.port,
-    path: path,
-    method:   'GET'
-  }, function (response) {
-
-    // response
-    response.setEncoding (props.encoding || 'utf8');
-    var data = '';
-
-    response.on ('data', function (chunk) { data += chunk });
-    response.on ('end', function () {
-
-      if (typeof props.callback == 'function') {
-        data = data.trim ();
-        props.callback (data);
-      }
-    });
-  });
-
-  // fail
-  req.on ('error', function (err) {
-    app.emit ('connection-error', err);
-  });
-
-  // disconnect
-  req.end ();
-};
-
-// ready
-module.exports = app;
+module.exports = setup;
