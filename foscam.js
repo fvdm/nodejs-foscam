@@ -323,6 +323,10 @@ function configDatetime (params, callback) {
     params: params
   };
 
+  if (typeof param.ntp_enable === 'boolean') {
+    options.params.ntp_enable = param.ntp_enable ? 1 : 0;
+  }
+
   httpRequest (options, callback);
 }
 
