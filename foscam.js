@@ -199,6 +199,7 @@ function systemStatus (callback) {
 // pan/tilt
 function controlPTZ (cmd, callback) {
   var commands = {
+    'stop': 1,
     'up': 0,
     'stop up': 1,
     'down': 2,
@@ -207,11 +208,17 @@ function controlPTZ (cmd, callback) {
     'stop left': 5,
     'right': 6,
     'stop right': 7,
+    'repeat horizontal patrol': 20,
+    'stop repeat horizontal patrol': 21,
     'center': 25,
     'vertical patrol': 26,
     'stop vertical patrol': 27,
     'horizontal patrol': 28,
     'stop horizontal patrol': 29,
+    'left up': 90,
+    'right up': 91,
+    'left down': 92,
+    'right down': 93,
     'io output high': 94,
     'io output low': 95
   };
