@@ -189,7 +189,16 @@ function systemStatus (callback) {
   httpRequest ({ path: '/get_status.cgi' }, doCallback);
 }
 
-// pan/tilt
+
+/**
+ * Control PTZ motor
+ *
+ * @callback callback
+ * @param cmd {string, number} - Command name or ID
+ * @param [callback] {function} - `function (err, data) {}`
+ * @returns {void}
+ */
+
 function controlPTZ (cmd, callback) {
   var commands = {
     'stop': 1,
@@ -231,7 +240,14 @@ function controlPTZ (cmd, callback) {
 }
 
 
-// Presets
+/**
+ * Translate preset action and ID to command ID
+ *
+ * @param action {string} - `set` or `go`
+ * @param presetId {number} - Preset position ID [0-15]
+ * @returns {number} - Command ID
+ */
+
 function preset2cmd (action, presetId) {
   var cmds = {
     set: [30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60],
@@ -241,16 +257,44 @@ function preset2cmd (action, presetId) {
   return cmds [action] [presetId - 1];
 }
 
-function controlStorePreset (id, callback) {
-  controlPTZ (preset2cmd ('set', id), callback);
+
+/**
+ * Store current PTZ as preset
+ *
+ * @callback callback
+ * @param presetId {number} - Preset position ID [0-15]
+ * @param callback {function} - `function (err, data) {}`
+ * @returns {void}
+ */
+
+function controlStorePreset (presetId, callback) {
+  controlPTZ (preset2cmd ('set', presetId), callback);
 }
 
-function controlGotoPreset (id, callback) {
-  controlPTZ (preset2cmd ('go', id), callback);
+
+/**
+ * Go to preset PTZ
+ *
+ * @callback callback
+ * @param presetId {number} - Preset position ID [0-15]
+ * @param callback {function} - `function (err, data) {}`
+ * @returns {void}
+ */
+
+function controlGotoPreset (presetId, callback) {
+  controlPTZ (preset2cmd ('go', presetId), callback);
 }
 
 
-// alias
+/**
+ * Configure camera alias
+ *
+ * @callback callback
+ * @param alias {string} - Alias text
+ * @param callback {function} - `function (err, data) {}`
+ * @returns {void}
+ */
+
 function configAlias (alias, callback) {
   var options = {
     path: '/set_alias.cgi',
@@ -262,7 +306,17 @@ function configAlias (alias, callback) {
   httpRequest (options, callback);
 }
 
-// datetime
+/**
+ * Change date/time settings
+ *
+ * @callback callback
+ * @param params {object} - Settings to change
+ * @param [params.ntp_enable] {boolean} - Enable NTP sync
+ * @param [params.ntp_svr] {string} - NTP hostname
+ * @param [params.tz] {number} - Timezone offset in seconds
+ * @param returns {void}
+ */
+
 function configDatetime (params, callback) {
   var options = {
     path: '/set_datetime.cgi',
@@ -272,13 +326,30 @@ function configDatetime (params, callback) {
   httpRequest (options, callback);
 }
 
-// restore factory
+
+/**
+ * Restore config to factory defaults
+ *
+ * @callback callback
+ * @param callback {function} - `function (err, data) {}`
+ * @returns {void}
+ */
+
 function configFactoryRestore (callback) {
   httpRequest ({ path: '/restore_factory.cgi' }, callback);
 }
 
 
-// camera settings
+/**
+ * Configure video image settings
+ *
+ * @callback callback
+ * @param [param] {string} - Parameter name or ID
+ * @param [value] {string, number} - Parameter value string or ID
+ * @param callback {function} - `function (err, data) {}`
+ * @returns {void}
+ */
+
 function configVideo (param, value, callback) {
   var params = {
     resolution: 0,
@@ -321,13 +392,28 @@ function configVideo (param, value, callback) {
 }
 
 
-// reboot
+/**
+ * Reboot camera
+ *
+ * @callback callback
+ * @param callback {function} - `function (err, data) {}`
+ * @returns {void}
+ */
+
 function systemReboot (callback) {
   httpRequest ({ path: '/reboot.cgi' }, callback);
 }
 
 
-// snapshot
+/**
+ * Capture video still
+ *
+ * @callback callback
+ * @param [filepath] {string} - Full path and filename to store JPG image
+ * @param callback {function} - `function (err, data) {}`
+ * @returns {void}
+ */
+
 function controlSnapshot (filepath, callback) {
   var options = {
     path: '/snapshot.cgi',
