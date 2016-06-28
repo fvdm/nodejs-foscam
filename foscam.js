@@ -223,6 +223,10 @@ function controlPTZ (cmd, callback) {
     }
   };
 
+  if (!callback) {
+    callback = function () {};
+  }
+
   httpRequest (options, callback);
 }
 
