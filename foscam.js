@@ -53,6 +53,12 @@ function httpResponse (err, res, callback) {
     return;
   }
 
+  if (data === 'ok.') {
+    data = {
+      success: true
+    };
+  }
+
   callback (null, data);
 }
 
