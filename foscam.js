@@ -103,7 +103,6 @@ function httpRequest (props, callback) {
 
 function parseParams (data) {
   var result = {};
-  var i;
 
   data = data.replace (/^var ([^=]+)=([^;]*);/gm, function (str, key, val) {
     result [key] = val.replace (/^((\d+)|'([^']*)')$/, function (str2, match, number, string) {
