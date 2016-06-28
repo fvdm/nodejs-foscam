@@ -105,21 +105,15 @@ function parseParams (data) {
   var result = {};
   var i;
 
-  data = data.split ('\n');
+  data = data.replace (/^var ([^=]+)=([^;]*);/gm, function (str, key, val) {
+    result [key] = val.replace (/^((\d+)|'([^']*)')$/, function (str2, match, number, string) {
+      if (number) {
+        return parseInt (number, 10);
+      }
 
-  for (i = 0; i < data.length; i++) {
-    if (data [i]) {
-      data [i].replace (/^var ([^=]+)=([^;]*);/g, function (str, key, val) {
-        result [key] = val.replace (/^((\d+)|'([^']*)')$/, function (str2, match, number, string) {
-          if (number) {
-            return parseInt (number, 10);
-          }
-
-          return string;
-        });
-      });
-    }
-  }
+      return string;
+    });
+  });
 
   return result;
 }
