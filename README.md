@@ -3,6 +3,11 @@ foscam
 
 Node.js package to remote control, view and config a Foscam/Tenvis IP camera.
 
+[![npm](https://img.shields.io/npm/v/foscam.svg?maxAge=3600)](https://github.com/fvdm/nodejs-foscam/blob/master/CHANGELOG.md)
+[![Build Status](https://travis-ci.org/fvdm/nodejs-foscam.svg?branch=master)](https://travis-ci.org/fvdm/nodejs-foscam)
+[![Dependency Status](https://gemnasium.com/badges/github.com/fvdm/nodejs-foscam.svg)](https://gemnasium.com/github.com/fvdm/nodejs-foscam#runtime-dependencies)
+[![Coverage Status](https://coveralls.io/repos/github/fvdm/nodejs-foscam/badge.svg?branch=master)](https://coveralls.io/github/fvdm/nodejs-foscam?branch=master)
+
 All included methods are based on Foscam's (fragmented) API documentation
 and the web interface of a Tenvis camera.
 Some features may not be supported by non-pan/tilt, older cameras or old firmware.
