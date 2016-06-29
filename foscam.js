@@ -42,7 +42,9 @@ function httpResponse (err, res, callback) {
     return;
   }
 
-  data = data.trim ();
+  if (typeof data === 'string') {
+    data = data.trim ();
+  }
 
   if (res.statusCode >= 300) {
     error = new Error ('api error');
