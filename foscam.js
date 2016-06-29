@@ -487,12 +487,18 @@ function controlSnapshot (filepath, callback) {
  * @returns {object} - Interface methods
  */
 
-function setup (set) {
+function setup (set, callback) {
   config.endpoint = set.endpoint || config.endpoint;
   config.username = set.username || config.username;
   config.password = set.password || config.password;
   config.timeout = set.timeout || config.timeout;
 
+  // Optional status test
+  if (callback) {
+    systemStatus (callback);
+  }
+
+  // Interface methods
   return {
     config: {
       alias: configAlias,
