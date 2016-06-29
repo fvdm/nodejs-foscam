@@ -44,6 +44,43 @@ Installation
 `npm install foscam`
 
 
+Configuration
+-------------
+
+**( properties, [callback] )**
+
+In order to connect to the camera you first need to provide its access details. When the `callback` function is provided, it will attempt to connect to the camera and retrieve its status, returned as object to the callback. When it fails the callback gets and _Error_.
+
+
+name     | type   | default                   | description
+:--------|:-------|:--------------------------|:---------------------
+endpoint | string | 'http://192.168.1.239:81' | Camera URL
+username | string | 'admin'                   | Username
+password | string |                           | Password
+timeout  | number | 5000                      | Wait timeout in ms
+
+
+```js
+function statusCallback (err, data) {
+  if (err) {
+    console.log ('Can\'t connect');
+    console.log (err);
+    return;
+  }
+
+  console.log ('Camera online: ' + data.alarm_status_str);
+}
+
+var config = {
+  endpoint: 'http://192.168.1.123:8080',
+  username: 'myname',
+  password: 'mysecret'
+};
+
+var camera = require ('foscam') (config, statusCallback);
+```
+
+
 Methods
 -------
 
@@ -52,49 +89,38 @@ Every method takes a `callback` function as last parameter. The callbacks are th
 **NOTE:** Some methods require a certain access-level, i.e. *admins* can do everything, but a *visitor* can only view.
 
 
-### Basic
-
-### setup
-#### ( properties, [callback] )
-
-In order to connect to the camera you first need to provide its access details. You can either do this by setting the properties below directly in `cam.settings`, but better is to use `cam.setup()`. When the `callback` function is provided, `setup()` will attempt to connect to the camera and retrieve its status, returned as object to the callback. When it fails the callback gets **false**.
-
-
-name | type   | default       | description
------|--------|---------------|----------------------
-host | string | 192.168.1.239 | Camera IP or hostname
-port | number | 81            | Camera port number
-user | string | admin         | Username
-pass | string |               | Password
-
+##### Example
 
 ```js
-cam.setup (
-  {
-    host: 'mycamera.lan',
-    port: 81,
-    user: 'admin'
-    pass: ''
-  },
-  function (status) {
-    if (!status) {
-      console.error ('ERROR: can\'t connect');    } else {
-      console.log (status);
-    }
+function myCallback (err, data) {
+  if (err) {
+    console.log (err);
+    return;
   }
-);
+
+  console.log (data);
+}
+
+camera.system.status (myCallback);
 ```
 
-### status
-#### ( callback )
 
-**Permission: everyone**
+### system.status
+**( callback )**
+
+**Permission:** everyone
 
 Get basic details from the camera.
 
+
+##### Example
+
 ```js
-cam.status (console.log);
+camera.system.status (console.log);
 ```
+
+
+##### Output
 
 ```js
 { id: '001A11A00A0B',
@@ -116,15 +142,19 @@ cam.status (console.log);
   upnp_status_str: 'No Action' }
 ```
 
-### camera_params
-#### ( callback )
 
-**Permission: visitor**
+### camera_params
+**( callback )**
+
+**Permission:** visitor
 
 Get camera sensor settings.
 
+
+##### Example
+
 ```js
-cam.camera_params (console.log);
+camera.camera_params (console.log);
 ```
 
 ```js
@@ -136,97 +166,120 @@ cam.camera_params (console.log);
   fps: 0 }
 ```
 
+
 ### Camera
 
-### snapshot
-#### ( [filename], callback )
+### control.snapshot
+**( [filename], callback )**
 
-Take a snapshot. Either receive the **binary JPEG** in the `callback` or specify a `filename` to store it on your computer.
+Take a snapshot. Either receive the **binary JPEG** _Buffer_ in the `callback` or specify a `filename` to store it on your computer.
 
 When a `filename` is provided the callback will return either the *filename* on success or *false* on faillure.
 
+
+##### Example
+
 ```js
 // custom processing
-cam.snapshot (function (jpeg) {
+camera.control.snapshot (function (jpegBuffer) {
   // add binary processing here
 });
 
-// store locally
-cam.snapshot ('./my_view.jpg', console.log);
+// or store locally
+camera.control.snapshot ('./my_view.jpg', console.log);
 ```
 
 
-### preset.set
-#### ( id, [cb] )
+### control.storePreset
+**( presetId, [callback] )**
 
 Save current camera position in preset #`id`. You can set presets 1 to 16.
 
+
+##### Example
+
 ```js
-cam.preset.set (3, console.log);
+// Save current PTZ angles in preset #3
+camera.control.storePreset (3, console.log);
 ```
 
 
-### preset.go
-#### ( id, [cb] )
+### control.gotoPreset
+**( presetId, [callback] )**
 
-Move camera to the position as stored in preset #`id`. You can use presets 1 to 16.
+Move camera to the position as stored in preset #`presetId`. You can use presets 1 to 16.
+
+
+##### Example
 
 ```js
-cam.preset.go (3, console.log);
+// Move to position #3
+camera.control.gotoPreset (3, console.log);
 ```
 
 
-### control.decoder
-#### ( command, [callback] )
+### control.ptz
+**( command, [callback] )**
 
 Control camera movement, like pan and tilt.
 
 The `command` to execute can be a string or number.
 
 
-command                | description
------------------------|------------------
-up                     | start moving up
-stop up                | stop moving up
-down                   | start moving down
-stop down              | stop moving down
-left                   | start moving left
-stop left              | stop moving left
-right                  | start moving right
-stop right             | stop moving right
-center                 | move to center
-vertical patrol        | start moving y-axis
-stop vertical patrol   | stop moving y-axis
-horizontal patrol      | start moving x-axis
-stop horizontal patrol | stop moving x-axis
-io output high         | iR on _(some cameras)_
-io output low          | iR off _(some camera)_
+command                | number | description
+:----------------------|:-------|:------------------------
+stop                   | 1      | stop any movement
+up                     | 0      | start moving up
+stop up                | 1      | stop moving up
+down                   | 2      | start moving down
+stop down              | 3      | stop moving down
+left                   | 4      | start moving left
+stop left              | 5      | stop moving left
+right                  | 6      | start moving right
+stop right             | 7      | stop moving right
+center                 | 25     | move to center (recalibration)
+vertical patrol        | 26     | start moving y-axis
+stop vertical patrol   | 27     | stop moving y-axis
+horizontal patrol      | 28     | start moving x-axis
+stop horizontal patrol | 29     | stop moving x-axis
+left up                | 90     | start moving left and upwards
+right up               | 91     | start moving right and upwards
+left down              | 92     | start moving left and downwards
+right down             | 93     | start moving right and downwards
+io output high         | 94     | iR on _(some cameras)_
+io output low          | 95     | iR off _(some camera)_
 
+
+##### Example
 
 ```js
-cam.control.decoder ('horizontal patrol', function () {
+camera.control.decoder ('horizontal patrol', function () {
   console.log ('Camera moving left-right');
 });
 ```
 
 
-### control.camera
-#### ( name, value, [callback] )
+### config.video
+**( name, value, [callback] )**
 
 Change a camera (sensor) setting.
 
 
 name       | value
------------|-----------------------------------
+:----------|:----------------------------------
 resolution | `240` (320x240) or `480` (640x480)
 brightness | `0` to `255`
 contrast   | `0` to `6`
-mode       | `50` Hz, `60` Hz or `outdoor`
+mode       | `50Hz`, `60Hz` or `outdoor`
 flipmirror | `default`, `flip`, `mirror` or `flipmirror`
 
 
+##### Example
+
 ```js
-cam.control.camera ('resolution', 640, function () {
+camera.config.video ('resolution', 480, function (err) {
+  if (err) { return console.log (err); }
+
   console.log ('Resolution changed to 640x480');
 });
 ```
@@ -234,62 +287,42 @@ cam.control.camera ('resolution', 640, function () {
 
 ### System
 
-### reboot
-#### ( [callback ] )
+### system.reboot
+**( [callback ] )**
 
 Reboot the device
 
+
+##### Example
+
 ```js
-cam.reboot (function () {
+camera.system.reboot (function (err) {
+  if (err) { return console.log (err); }
+
   console.log ('Rebooting camera');
 });
 ```
 
 
-### restore_factory
-#### ( [callback ] )
+### system.factoryRestore
+**( [callback ] )**
 
 Reset all settings back to their factory values.
 
+
+##### Example
+
 ```js
-cam.restore_factory (function () {
+camera.config.factoryRestore (function (err) {
+  if (err) { return console.log (err); }
+
   console.log ('Resetting camera settings to factory defaults');
 });
 ```
 
 
-### talk
-#### ( propsObject )
-
-Directly communicate with the device.
-
-
-property | type     | required | value
----------|----------|----------|----------------------
-path     | string   | yes      | i.e. `get_params.cgi`
-fields   | object   | no       | i.e. `{ntp_enable: 1, ntp_svr: 'ntp.xs4all.nl'}`
-encoding | string   | no       | `binary` or `utf8` (default)
-callback | function | yes      | i.e. `function (err, res)`
-
-
-```js
-cam.talk (
-  {
-    path: 'set_datetime.cgi',
-    fields: {
-      ntp_enable: 1,
-      ntp_svr: 'ntp.xs4all.nl',
-      tz: -3600
-    }
-  },
-  function (response) {
-    console.log (response);
-  }
-);
-```
-
-
-## Unlicense
+Unlicense
+---------
 
 This is free and unencumbered software released into the public domain.
 
@@ -317,8 +350,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <http://unlicense.org/>
 
 
-## Author
+Author
+------
 
-Franklin van de Meent
-| [Website](https://frankl.in)
-| [Github](https://github.com/fvdm)
+[Franklin van de Meent](https://frankl.in)
