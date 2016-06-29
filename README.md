@@ -1,46 +1,46 @@
-# foscam
+foscam
+======
 
-Remote control, view and config a Foscam/Tenvis IP camera.
+Node.js package to remote control, view and config a Foscam/Tenvis IP camera.
 
-All included methods are based on Foscam's (fragmented) API documentation.
+All included methods are based on Foscam's (fragmented) API documentation
+and the web interface of a Tenvis camera.
 Some features may not be supported by non-pan/tilt, older cameras or old firmware.
 So make sure you keep a backup of your camera settings, just in case.
 
 
-## Usage
+Usage example
+-------------
 
 ```js
-var cam = require ('foscam');
-
-cam.setup ({
-  host: 'mycamera.lan',
-  port: 81,
-  user: 'admin',
-  pass: ''
+var camera = require ('foscam') ({
+  endpoint: 'http://192.168.1.123:8080',
+  username: 'myname',
+  password: 'mysecret'
 });
 
 // start rotating left
-cam.control.decoder ('left', function () {
+camera.control.ptz ('left', function () {
 
   // stop rotation
-  cam.control.decoder ('stop left', function () {
+  camera.control.ptz ('stop left', function () {
 
     // take a picture and store it on your computer
-    cam.snapshot ('/path/to/save.jpg', console.log);
+    camera.snapshot ('/path/to/save.jpg', console.log);
 
   });
 });
 ```
 
 
-## Installation
+Installation
+------------
 
-Stable: `npm install foscam`
-
-Develop: `npm install fvdm/nodejs-foscam#develop`
+`npm install foscam`
 
 
-## Methods
+Methods
+-------
 
 Every method takes a `callback` function as last parameter. The callbacks are the only way to procedural scripting.
 
