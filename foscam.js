@@ -252,7 +252,7 @@ function controlPTZ (cmd, duration, callback) {
       }
 
       setTimeout (function controlPTZtimeout () {
-        controlPTZ ('stop ' + cmd, callback);
+        controlPTZ ('stop', callback);
       }, duration);
     });
 
