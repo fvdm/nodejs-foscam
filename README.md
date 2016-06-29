@@ -18,22 +18,22 @@ Usage example
 -------------
 
 ```js
+// Configuration
 var camera = require ('foscam') ({
   endpoint: 'http://192.168.1.123:8080',
   username: 'myname',
   password: 'mysecret'
 });
 
-// start rotating left
-camera.control.ptz ('left', function () {
+// Horizontal patrol for 5 seconds
+camera.control.ptz ('horizontal patrol', 5000, function (err) {
+  if (err) {
+    console.log (err);
+    return;
+  }
 
-  // stop rotation
-  camera.control.ptz ('stop left', function () {
-
-    // take a picture and store it on your computer
-    camera.snapshot ('/path/to/save.jpg', console.log);
-
-  });
+  // Take a picture and store it
+  camera.control.snapshot ('/path/to/save.jpg', console.log);
 });
 ```
 
