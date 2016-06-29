@@ -253,7 +253,7 @@ io output low          | 95     | iR off _(some camera)_
 ##### Example
 
 ```js
-camera.control.decoder ('horizontal patrol', function () {
+camera.control.ptz ('horizontal patrol', function () {
   console.log ('Camera moving left-right');
 });
 ```
