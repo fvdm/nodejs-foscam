@@ -195,11 +195,12 @@ function systemStatus (callback) {
  *
  * @callback callback
  * @param cmd {string, number} - Command name or ID
+ * @param [duration] {number} - Stop and callback after N milliseconds
  * @param [callback] {function} - `function (err, data) {}`
  * @returns {void}
  */
 
-function controlPTZ (cmd, callback) {
+function controlPTZ (cmd, duration, callback) {
   var commands = {
     'stop': 1,
     'up': 0,
@@ -232,8 +233,28 @@ function controlPTZ (cmd, callback) {
     }
   };
 
+  if (typeof duration === 'function') {
+    callback = duration;
+    duration = null;
+  }
+
   if (!callback) {
     callback = function () {};
+  }
+
+  if (duration && !cmd.match (/^stop( |$)/)) {
+    httpRequest (options, function controlPTZduration (err, data) {
+      if (err) {
+        callback (err);
+        return;
+      }
+
+      setTimeout (function controlPTZtimeout () {
+        controlPTZ ('stop ' + cmd, callback);
+      }, duration);
+    });
+
+    return;
   }
 
   httpRequest (options, callback);
