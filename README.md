@@ -1,5 +1,7 @@
 # foscam
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/fvdm/nodejs-foscam.svg)](https://greenkeeper.io/)
+
 Remote control, view and config a Foscam/Tenvis IP camera.
 
 All included methods are based on Foscam's (fragmented) API documentation.
