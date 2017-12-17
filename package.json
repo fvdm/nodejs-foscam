@@ -17,13 +17,10 @@
   "main": "foscam.js",
   "dependencies": {},
   "devDependencies": {
-    "coveralls": "^2.13.1",
-    "dotest": "^2.0.0",
-    "eslint": "^3.19.0",
-    "istanbul": "^0.4.5"
+    "dotest": "^2.3.0"
   },
   "engines": {
-    "node": ">=0.12.0"
+    "node": ">=4.0.0"
   },
   "keywords": [
     "camera",
