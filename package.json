@@ -20,7 +20,7 @@
     "dotest": "^2"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=18"
   },
   "keywords": [
     "camera",
