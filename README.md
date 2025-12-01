@@ -7,29 +7,62 @@ Some features may not be supported by non-pan/tilt, older cameras or old firmwar
 So make sure you keep a backup of your camera settings, just in case.
 
 
+## Requirements
+
+- Node.js 18 or newer (uses native `fetch()`)
+
+
 ## Usage
 
-```js
-var cam = require ('foscam');
+All methods support both **Promises** and **callbacks**.
+When no callback is provided, a Promise is returned.
 
-cam.setup ({
+### Promise style (async/await)
+
+```js
+const cam = require( 'foscam' );
+
+cam.setup( {
   host: 'mycamera.lan',
   port: 81,
   user: 'admin',
-  pass: ''
-});
+  pass: '',
+} );
+
+// Using async/await
+const status = await cam.status();
+console.log( status );
+
+// Take a snapshot
+await cam.control.decoder( 'left' );
+await cam.control.decoder( 'stop left' );
+const filepath = await cam.snapshot( '/path/to/save.jpg' );
+console.log( filepath );
+```
+
+### Callback style
+
+```js
+const cam = require( 'foscam' );
+
+cam.setup( {
+  host: 'mycamera.lan',
+  port: 81,
+  user: 'admin',
+  pass: '',
+} );
 
 // start rotating left
-cam.control.decoder ('left', function () {
+cam.control.decoder( 'left', () => {
 
   // stop rotation
-  cam.control.decoder ('stop left', function () {
+  cam.control.decoder( 'stop left', () => {
 
     // take a picture and store it on your computer
-    cam.snapshot ('/path/to/save.jpg', console.log);
+    cam.snapshot( '/path/to/save.jpg', console.log );
 
-  });
-});
+  } );
+} );
 ```
 
 
@@ -42,7 +75,8 @@ Develop: `npm install fvdm/nodejs-foscam#develop`
 
 ## Methods
 
-Every method takes a `callback` function as last parameter. The callbacks are the only way to procedural scripting.
+Every method takes an optional `callback` function as last parameter.
+When no callback is provided, the method returns a **Promise**.
 
 **NOTE:** Some methods require a certain access-level, i.e. *admins* can do everything, but a *visitor* can only view.
 
@@ -55,40 +89,66 @@ Every method takes a `callback` function as last parameter. The callbacks are th
 In order to connect to the camera you first need to provide its access details. You can either do this by setting the properties below directly in `cam.settings`, but better is to use `cam.setup()`. When the `callback` function is provided, `setup()` will attempt to connect to the camera and retrieve its status, returned as object to the callback. When it fails the callback gets **false**.
 
 
-name | type   | default       | description
------|--------|---------------|----------------------
-host | string | 192.168.1.239 | Camera IP or hostname
-port | number | 81            | Camera port number
-user | string | admin         | Username
-pass | string |               | Password
+name    | type   | default       | description
+--------|--------|---------------|----------------------
+host    | string | 192.168.1.239 | Camera IP or hostname
+port    | number | 81            | Camera port number
+user    | string | admin         | Username
+pass    | string |               | Password
+timeout | number | 5000          | Request timeout in ms
 
 
 ```js
-cam.setup (
+// Promise style
+const status = await cam.setup( {
+  host: 'mycamera.lan',
+  port: 81,
+  user: 'admin',
+  pass: '',
+} );
+
+if ( !status ) {
+  console.error( 'ERROR: can\'t connect' );
+}
+else {
+  console.log( status );
+}
+```
+
+```js
+// Callback style
+cam.setup(
   {
     host: 'mycamera.lan',
     port: 81,
-    user: 'admin'
-    pass: ''
+    user: 'admin',
+    pass: '',
   },
-  function (status) {
-    if (!status) {
-      console.error ('ERROR: can\'t connect');    } else {
-      console.log (status);
+  ( status ) => {
+    if ( !status ) {
+      console.error( 'ERROR: can\'t connect' );
+    }
+    else {
+      console.log( status );
     }
   }
 );
 ```
 
 ### status
-#### ( callback )
+#### ( [callback] )
 
 **Permission: everyone**
 
 Get basic details from the camera.
 
 ```js
-cam.status (console.log);
+// Promise
+const result = await cam.status();
+console.log( result );
+
+// Callback
+cam.status( console.log );
 ```
 
 ```js
@@ -112,14 +172,19 @@ cam.status (console.log);
 ```
 
 ### camera_params
-#### ( callback )
+#### ( [callback] )
 
 **Permission: visitor**
 
 Get camera sensor settings.
 
 ```js
-cam.camera_params (console.log);
+// Promise
+const params = await cam.camera_params();
+console.log( params );
+
+// Callback
+cam.camera_params( console.log );
 ```
 
 ```js
@@ -134,20 +199,28 @@ cam.camera_params (console.log);
 ### Camera
 
 ### snapshot
-#### ( [filename], callback )
+#### ( [filename], [callback] )
 
 Take a snapshot. Either receive the **binary JPEG** in the `callback` or specify a `filename` to store it on your computer.
 
-When a `filename` is provided the callback will return either the *filename* on success or *false* on faillure.
+When a `filename` is provided the callback will return either the *filename* on success or *false* on failure.
 
 ```js
-// custom processing
-cam.snapshot (function (jpeg) {
-  // add binary processing here
-});
+// Promise - custom processing
+const jpeg = await cam.snapshot();
+// add binary processing here
 
-// store locally
-cam.snapshot ('./my_view.jpg', console.log);
+// Promise - store locally
+const filepath = await cam.snapshot( './my_view.jpg' );
+console.log( filepath );
+
+// Callback - custom processing
+cam.snapshot( ( jpeg ) => {
+  // add binary processing here
+} );
+
+// Callback - store locally
+cam.snapshot( './my_view.jpg', console.log );
 ```
 
 
@@ -157,7 +230,11 @@ cam.snapshot ('./my_view.jpg', console.log);
 Save current camera position in preset #`id`. You can set presets 1 to 16.
 
 ```js
-cam.preset.set (3, console.log);
+// Promise
+await cam.preset.set( 3 );
+
+// Callback
+cam.preset.set( 3, console.log );
 ```
 
 
@@ -167,7 +244,11 @@ cam.preset.set (3, console.log);
 Move camera to the position as stored in preset #`id`. You can use presets 1 to 16.
 
 ```js
-cam.preset.go (3, console.log);
+// Promise
+await cam.preset.go( 3 );
+
+// Callback
+cam.preset.go( 3, console.log );
 ```
 
 
@@ -199,9 +280,14 @@ io output low          | iR off _(some camera)_
 
 
 ```js
-cam.control.decoder ('horizontal patrol', function () {
-  console.log ('Camera moving left-right');
-});
+// Promise
+await cam.control.decoder( 'horizontal patrol' );
+console.log( 'Camera moving left-right' );
+
+// Callback
+cam.control.decoder( 'horizontal patrol', () => {
+  console.log( 'Camera moving left-right' );
+} );
 ```
 
 
@@ -221,35 +307,50 @@ flipmirror | `default`, `flip`, `mirror` or `flipmirror`
 
 
 ```js
-cam.control.camera ('resolution', 640, function () {
-  console.log ('Resolution changed to 640x480');
-});
+// Promise
+await cam.control.camera( 'resolution', 640 );
+console.log( 'Resolution changed to 640x480' );
+
+// Callback
+cam.control.camera( 'resolution', 640, () => {
+  console.log( 'Resolution changed to 640x480' );
+} );
 ```
 
 
 ### System
 
 ### reboot
-#### ( [callback ] )
+#### ( [callback] )
 
 Reboot the device
 
 ```js
-cam.reboot (function () {
-  console.log ('Rebooting camera');
-});
+// Promise
+await cam.reboot();
+console.log( 'Rebooting camera' );
+
+// Callback
+cam.reboot( () => {
+  console.log( 'Rebooting camera' );
+} );
 ```
 
 
 ### restore_factory
-#### ( [callback ] )
+#### ( [callback] )
 
 Reset all settings back to their factory values.
 
 ```js
-cam.restore_factory (function () {
-  console.log ('Resetting camera settings to factory defaults');
-});
+// Promise
+await cam.restore_factory();
+console.log( 'Resetting camera settings to factory defaults' );
+
+// Callback
+cam.restore_factory( () => {
+  console.log( 'Resetting camera settings to factory defaults' );
+} );
 ```
 
 
@@ -262,25 +363,36 @@ Directly communicate with the device.
 property | type     | required | value
 ---------|----------|----------|----------------------
 path     | string   | yes      | i.e. `get_params.cgi`
-fields   | object   | no       | i.e. `{ntp_enable: 1, ntp_svr: 'ntp.xs4all.nl'}`
+fields   | object   | no       | i.e. `{ ntp_enable: 1, ntp_svr: 'ntp.xs4all.nl' }`
 encoding | string   | no       | `binary` or `utf8` (default)
-callback | function | yes      | i.e. `function (err, res)`
+callback | function | no       | i.e. `( response ) => {}`
+timeout  | number   | no       | Request timeout in ms (default: 5000)
 
 
 ```js
-cam.talk (
-  {
-    path: 'set_datetime.cgi',
-    fields: {
-      ntp_enable: 1,
-      ntp_svr: 'ntp.xs4all.nl',
-      tz: -3600
-    }
+// Promise
+const response = await cam.talk( {
+  path: 'set_datetime.cgi',
+  fields: {
+    ntp_enable: 1,
+    ntp_svr: 'ntp.xs4all.nl',
+    tz: -3600,
   },
-  function (response) {
-    console.log (response);
-  }
-);
+} );
+console.log( response );
+
+// Callback
+cam.talk( {
+  path: 'set_datetime.cgi',
+  fields: {
+    ntp_enable: 1,
+    ntp_svr: 'ntp.xs4all.nl',
+    tz: -3600,
+  },
+  callback: ( response ) => {
+    console.log( response );
+  },
+} );
 ```
 
 
