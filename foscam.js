@@ -8,11 +8,9 @@ Feedback:       https://github.com/fvdm/nodejs-foscam/issues
 License:        Unlicense (public domain) - see LICENSE file
 */
 
-var http = require ('http');
-var querystring = require ('querystring');
-var fs = require ('fs');
-var EventEmitter = require ('events') .EventEmitter;
-var app = new EventEmitter;
+const fs = require( 'fs' );
+const { EventEmitter } = require( 'events' );
+const app = new EventEmitter();
 
 // defaults
 app.settings = {
@@ -23,116 +21,133 @@ app.settings = {
 };
 
 // overrides
-app.setup = function (props, cb) {
-  for (var key in props) {
-    app.settings [key] = props [key];
+app.setup = function( props, cb ) {
+  for ( const key in props ) {
+    app.settings[key] = props[key];
   }
 
-  if (typeof cb == 'function') {
-    app.status (cb);
+  if ( typeof cb === 'function' ) {
+    return app.status( cb );
   }
+
+  return undefined;
 };
 
 
 // status
-app.status = function (cb) {
-  app.talk ({
-    path: 'get_status.cgi',
-    callback: function (data) {
-      var result = {};
-      data = data.split ('\n');
-      for (var d in data) {
-        if (data[d] != '') {
-          var line = data[d].split ('var ');
-          line = String (line[1]).split ('=');
-          line[1] = String (line[1]).replace (/;$/, '');
-          result [line[0]] = line[1].substr (0,1) == '\'' ? line[1].substr (1, line[1].length -2) : line[1];
-        }
-      }
+app.status = function( cb ) {
+  const processData = ( data ) => {
+    const result = {};
+    const lines = data.split( '\n' );
 
-      if (result.alarm_status) {
-        switch (result.alarm_status) {
-          case '0': result.alarm_status_str = 'no alarm'; break;
-          case '1': result.alarm_status_str = 'motion alarm'; break;
-          case '2': result.alarm_status_str = 'input alarm'; break;
-        }
+    for ( const line of lines ) {
+      if ( line !== '' ) {
+        const parts = line.split( 'var ' );
+        const parsed = String( parts[1] ).split( '=' );
+        parsed[1] = String( parsed[1] ).replace( /;$/, '' );
+        result[parsed[0]] = parsed[1].substring( 0, 1 ) === '\'' ? parsed[1].substring( 1, parsed[1].length - 2 ) : parsed[1];
       }
-
-      if (result.ddns_status) {
-        switch (result.ddns_status) {
-          case '0': result.ddns_status_str = 'No Action'; break;
-          case '1': result.ddns_status_str = 'It\'s connecting...'; break;
-          case '2': result.ddns_status_str = 'Can\'t connect to the Server'; break;
-          case '3': result.ddns_status_str = 'Dyndns Succeed'; break;
-          case '4': result.ddns_status_str = 'DynDns Failed: Dyndns.org Server Error'; break;
-          case '5': result.ddns_status_str = 'DynDns Failed: Incorrect User or Password'; break;
-          case '6': result.ddns_status_str = 'DynDns Failed: Need Credited User'; break;
-          case '7': result.ddns_status_str = 'DynDns Failed: Illegal Host Format'; break;
-          case '8': result.ddns_status_str = 'DynDns Failed: The Host Does not Exist'; break;
-          case '9': result.ddns_status_str = 'DynDns Failed: The Host Does not Belong to You'; break;
-          case '10': result.ddns_status_str = 'DynDns Failed: Too Many or Too Few Hosts'; break;
-          case '11': result.ddns_status_str = 'DynDns Failed: The Host is Blocked for Abusing'; break;
-          case '12': result.ddns_status_str = 'DynDns Failed: Bad Reply from Server'; break;
-          case '13': result.ddns_status_str = 'DynDns Failed: Bad Reply from Server'; break;
-          case '14': result.ddns_status_str = 'Oray Failed: Bad Reply from Server'; break;
-          case '15': result.ddns_status_str = 'Oray Failed: Incorrect User or Password'; break;
-          case '16': result.ddns_status_str = 'Oray Failed: Incorrect Hostname'; break;
-          case '17': result.ddns_status_str = 'Oray Succeed'; break;
-          case '18': result.ddns_status_str = 'Reserved'; break;
-          case '19': result.ddns_status_str = 'Reserved'; break;
-          case '20': result.ddns_status_str = 'Reserved'; break;
-          case '21': result.ddns_status_str = 'Reserved'; break;
-        }
-      }
-
-      if (result.upnp_status) {
-        switch (result.upnp_status) {
-          case '0': result.upnp_status_str = 'No Action'; break;
-          case '1': result.upnp_status_str = 'Succeed'; break;
-          case '2': result.upnp_status_str = 'Device System Error'; break;
-          case '3': result.upnp_status_str = 'Errors in Network Communication'; break;
-          case '4': result.upnp_status_str = 'Errors in Chat with UPnP Device'; break;
-          case '5': result.upnp_status_str = 'Rejected by UPnP Device, Maybe Port Conflict'; break;
-        }
-      }
-
-      cb (result);
     }
-  });
+
+    if ( result.alarm_status ) {
+      switch ( result.alarm_status ) {
+        case '0': result.alarm_status_str = 'no alarm'; break;
+        case '1': result.alarm_status_str = 'motion alarm'; break;
+        case '2': result.alarm_status_str = 'input alarm'; break;
+      }
+    }
+
+    if ( result.ddns_status ) {
+      switch ( result.ddns_status ) {
+        case '0': result.ddns_status_str = 'No Action'; break;
+        case '1': result.ddns_status_str = 'It\'s connecting...'; break;
+        case '2': result.ddns_status_str = 'Can\'t connect to the Server'; break;
+        case '3': result.ddns_status_str = 'Dyndns Succeed'; break;
+        case '4': result.ddns_status_str = 'DynDns Failed: Dyndns.org Server Error'; break;
+        case '5': result.ddns_status_str = 'DynDns Failed: Incorrect User or Password'; break;
+        case '6': result.ddns_status_str = 'DynDns Failed: Need Credited User'; break;
+        case '7': result.ddns_status_str = 'DynDns Failed: Illegal Host Format'; break;
+        case '8': result.ddns_status_str = 'DynDns Failed: The Host Does not Exist'; break;
+        case '9': result.ddns_status_str = 'DynDns Failed: The Host Does not Belong to You'; break;
+        case '10': result.ddns_status_str = 'DynDns Failed: Too Many or Too Few Hosts'; break;
+        case '11': result.ddns_status_str = 'DynDns Failed: The Host is Blocked for Abusing'; break;
+        case '12': result.ddns_status_str = 'DynDns Failed: Bad Reply from Server'; break;
+        case '13': result.ddns_status_str = 'DynDns Failed: Bad Reply from Server'; break;
+        case '14': result.ddns_status_str = 'Oray Failed: Bad Reply from Server'; break;
+        case '15': result.ddns_status_str = 'Oray Failed: Incorrect User or Password'; break;
+        case '16': result.ddns_status_str = 'Oray Failed: Incorrect Hostname'; break;
+        case '17': result.ddns_status_str = 'Oray Succeed'; break;
+        case '18': result.ddns_status_str = 'Reserved'; break;
+        case '19': result.ddns_status_str = 'Reserved'; break;
+        case '20': result.ddns_status_str = 'Reserved'; break;
+        case '21': result.ddns_status_str = 'Reserved'; break;
+      }
+    }
+
+    if ( result.upnp_status ) {
+      switch ( result.upnp_status ) {
+        case '0': result.upnp_status_str = 'No Action'; break;
+        case '1': result.upnp_status_str = 'Succeed'; break;
+        case '2': result.upnp_status_str = 'Device System Error'; break;
+        case '3': result.upnp_status_str = 'Errors in Network Communication'; break;
+        case '4': result.upnp_status_str = 'Errors in Chat with UPnP Device'; break;
+        case '5': result.upnp_status_str = 'Rejected by UPnP Device, Maybe Port Conflict'; break;
+      }
+    }
+
+    return result;
+  };
+
+  if ( typeof cb === 'function' ) {
+    app.talk( {
+      path: 'get_status.cgi',
+      callback: ( data ) => cb( processData( data ) )
+    } );
+    return undefined;
+  }
+
+  return app.talk( { path: 'get_status.cgi' } ).then( processData );
 };
 
 
 // camera params
-app.camera_params = function (cb) {
-  app.talk ({
-    path: 'get_camera_params.cgi',
-    callback: function (data) {
-      var result = {}
-      data.replace (/var ([^=]+)=([^;]+);/g, function (str, key, value) {
-        result [key] = parseInt (value);
-      });
-      cb (result);
-    }
-  });
+app.camera_params = function( cb ) {
+  const processData = ( data ) => {
+    const result = {};
+    data.replace( /var ([^=]+)=([^;]+);/g, ( str, key, value ) => {
+      result[key] = parseInt( value, 10 );
+    } );
+    return result;
+  };
+
+  if ( typeof cb === 'function' ) {
+    app.talk( {
+      path: 'get_camera_params.cgi',
+      callback: ( data ) => cb( processData( data ) )
+    } );
+    return undefined;
+  }
+
+  return app.talk( { path: 'get_camera_params.cgi' } ).then( processData );
 };
 
 
 // Presets
 app.preset = {
-  id2cmd: function (action, id) {
-    var cmds = {
-      set: [30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60],
-      go: [31,33,35,37,39,41,43,45,47,49,51,53,55,57,59,61]
-    }
-    return cmds [action] [id-1];
+  id2cmd: function( action, id ) {
+    const cmds = {
+      set: [30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60],
+      go: [31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61]
+    };
+    return cmds[action][id - 1];
   },
 
-  set: function (id, cb) {
-    app.control.decoder (app.preset.id2cmd ('set', id), cb);
+  set: function( id, cb ) {
+    return app.control.decoder( app.preset.id2cmd( 'set', id ), cb );
   },
 
-  go: function (id, cb) {
-    app.control.decoder (app.preset.id2cmd ('go', id), cb);
+  go: function( id, cb ) {
+    return app.control.decoder( app.preset.id2cmd( 'go', id ), cb );
   }
 };
 
@@ -141,103 +156,114 @@ app.preset = {
 app.control = {
 
   // pan/tilt
-  decoder: function (cmd, cb) {
+  decoder: function( cmd, cb ) {
+    let command = cmd;
 
-    if (typeof cmd == 'string' && !cmd.match (/^[0-9]+$/)) {
-      switch (cmd) {
-        case 'up': cmd = 0; break;
-        case 'stop up': cmd = 1; break;
-        case 'down': cmd = 2; break;
-        case 'stop down': cmd = 3; break;
-        case 'left': cmd = 4; break;
-        case 'stop left': cmd = 5; break;
-        case 'right': cmd = 6; break;
-        case 'stop right': cmd = 7; break;
-        case 'center': cmd = 25; break;
-        case 'vertical patrol': cmd = 26; break;
-        case 'stop vertical patrol': cmd = 27; break;
-        case 'horizontal patrol': cmd = 28; break;
-        case 'stop horizontal patrol': cmd = 29; break;
-        case 'io output high': cmd = 94; break;
-        case 'io output low': cmd = 95; break;
+    if ( typeof command === 'string' && !command.match( /^[0-9]+$/ ) ) {
+      switch ( command ) {
+        case 'up': command = 0; break;
+        case 'stop up': command = 1; break;
+        case 'down': command = 2; break;
+        case 'stop down': command = 3; break;
+        case 'left': command = 4; break;
+        case 'stop left': command = 5; break;
+        case 'right': command = 6; break;
+        case 'stop right': command = 7; break;
+        case 'center': command = 25; break;
+        case 'vertical patrol': command = 26; break;
+        case 'stop vertical patrol': command = 27; break;
+        case 'horizontal patrol': command = 28; break;
+        case 'stop horizontal patrol': command = 29; break;
+        case 'io output high': command = 94; break;
+        case 'io output low': command = 95; break;
       }
     }
 
-    app.talk ({
+    if ( typeof cb === 'function' ) {
+      app.talk( {
+        path: 'decoder_control.cgi',
+        fields: { command },
+        callback: cb
+      } );
+      return undefined;
+    }
+
+    return app.talk( {
       path: 'decoder_control.cgi',
-      fields: { command: cmd },
-      callback: cb
-    });
+      fields: { command }
+    } );
   },
 
   // camera settings
-  camera: function (param, value, cb) {
+  camera: function( param, value, cb ) {
+    let paramVal = param;
+    let valueVal = value;
 
     // fix param
-    if (typeof param == 'string' && !param.match (/^[0-9]+$/)) {
-      switch (param) {
+    if ( typeof paramVal === 'string' && !paramVal.match( /^[0-9]+$/ ) ) {
+      switch ( paramVal ) {
 
-        case 'brightness': param = 1; break;
-        case 'contrast': param = 2; break;
+        case 'brightness': paramVal = 1; break;
+        case 'contrast': paramVal = 2; break;
 
         // resolution
         case 'resolution':
-          param = 0;
-          if (typeof value == 'string' && !value.match (/^[0-9]{1,2}$/)) {
-            switch (value) {
+          paramVal = 0;
+          if ( typeof valueVal === 'string' && !valueVal.match( /^[0-9]{1,2}$/ ) ) {
+            switch ( valueVal ) {
               case '320':
               case '320x240':
               case '320*240':
-                value = 8;
+                valueVal = 8;
                 break;
 
               case '640':
               case '640x480':
               case '640*480':
-                value = 32;
+                valueVal = 32;
                 break;
             }
           }
           break;
 
         case 'mode':
-          param = 3;
-          if (typeof value == 'string' && !value.match (/^[0-9]$/)) {
-            switch (value.toLowerCase ()) {
+          paramVal = 3;
+          if ( typeof valueVal === 'string' && !valueVal.match( /^[0-9]$/ ) ) {
+            switch ( valueVal.toLowerCase() ) {
               case '50':
               case '50hz':
               case '50 hz':
-                value = 0;
+                valueVal = 0;
                 break;
 
               case '60':
               case '60hz':
               case '60 hz':
-                value = 1;
+                valueVal = 1;
                 break;
 
               case 'outdoor':
               case 'outside':
-                value = 2;
+                valueVal = 2;
                 break;
             }
           }
           break;
 
         case 'flipmirror':
-          param = 5;
-          if (typeof value == 'string' && !value.match (/^[0-9]$/)) {
-            switch (value.toLowerCase ()) {
+          paramVal = 5;
+          if ( typeof valueVal === 'string' && !valueVal.match( /^[0-9]$/ ) ) {
+            switch ( valueVal.toLowerCase() ) {
               case 'default':
-                value = 0;
+                valueVal = 0;
                 break;
 
               case 'flip':
-                value = 1;
+                valueVal = 1;
                 break;
 
               case 'mirror':
-                value = 2;
+                valueVal = 2;
                 break;
 
               case 'flipmirror':
@@ -245,7 +271,7 @@ app.control = {
               case 'flip+mirror':
               case 'flip + mirror':
               case 'flip & mirror':
-                value = 3;
+                valueVal = 3;
                 break;
             }
           }
@@ -254,42 +280,68 @@ app.control = {
     }
 
     // send it
-    app.talk ({
+    if ( typeof cb === 'function' ) {
+      app.talk( {
+        path: 'camera_control.cgi',
+        fields: {
+          param: paramVal,
+          value: valueVal
+        },
+        callback: cb
+      } );
+      return undefined;
+    }
+
+    return app.talk( {
       path: 'camera_control.cgi',
       fields: {
-        param: param,
-        value: value
-      },
-      callback: cb
-    });
+        param: paramVal,
+        value: valueVal
+      }
+    } );
   }
 };
 
 
 // reboot
-app.reboot = function (cb) {
-  app.talk ({
-    path: 'reboot.cgi',
-    callback: cb
-  });
+app.reboot = function( cb ) {
+  if ( typeof cb === 'function' ) {
+    app.talk( {
+      path: 'reboot.cgi',
+      callback: cb
+    } );
+    return undefined;
+  }
+
+  return app.talk( { path: 'reboot.cgi' } );
 };
 
 
 // restore factory
-app.restore_factory = function (cb) {
-  app.talk ({
-    path: 'restore_factory.cgi',
-    callback: cb
-  });
+app.restore_factory = function( cb ) {
+  if ( typeof cb === 'function' ) {
+    app.talk( {
+      path: 'restore_factory.cgi',
+      callback: cb
+    } );
+    return undefined;
+  }
+
+  return app.talk( { path: 'restore_factory.cgi' } );
 };
 
 
 // params
-app.params = function (cb) {
-  app.talk ({
-    path: 'get_params.cgi',
-    callback: cb
-  });
+app.params = function( cb ) {
+  if ( typeof cb === 'function' ) {
+    app.talk( {
+      path: 'get_params.cgi',
+      callback: cb
+    } );
+    return undefined;
+  }
+
+  return app.talk( { path: 'get_params.cgi' } );
 };
 
 
@@ -297,93 +349,127 @@ app.params = function (cb) {
 app.set = {
 
   // alias
-  alias: function (alias, cb) {
-    app.talk ({
+  alias: function( alias, cb ) {
+    if ( typeof cb === 'function' ) {
+      app.talk( {
+        path: 'set_alias.cgi',
+        fields: { alias },
+        callback: cb
+      } );
+      return undefined;
+    }
+
+    return app.talk( {
       path: 'set_alias.cgi',
-      fields: { alias: alias },
-      callback: cb
-    });
+      fields: { alias }
+    } );
   },
 
   // datetime
-  datetime: function (props, cb) {
-    app.talk ({
+  datetime: function( props, cb ) {
+    if ( typeof cb === 'function' ) {
+      app.talk( {
+        path: 'set_datetime.cgi',
+        fields: props,
+        callback: cb
+      } );
+      return undefined;
+    }
+
+    return app.talk( {
       path: 'set_datetime.cgi',
-      fields: props,
-      callback: cb
-    });
+      fields: props
+    } );
   }
 };
 
 
 // snapshot
-app.snapshot = function (filepath, cb) {
-  if (!cb && typeof filepath == 'function') {
-    var cb = filepath;
-    var filepath = false;
+app.snapshot = function( filepath, cb ) {
+  let callback = cb;
+  let savePath = filepath;
+
+  if ( !callback && typeof filepath === 'function' ) {
+    callback = filepath;
+    savePath = false;
   }
 
-  app.talk ({
-    path: 'snapshot.cgi',
-    encoding: 'binary',
-    callback: function (bin) {
-      if (filepath) {
-        fs.writeFile (filepath, bin, 'binary', function (err) {
-          if (err) {
-            throw err;
-            cb (false);
-          } else {
-            cb (filepath);
-          }
-        });
-      } else {
-        cb (bin);
-      }
+  const processData = async ( bin ) => {
+    if ( savePath ) {
+      await fs.promises.writeFile( savePath, bin, 'binary' );
+      return savePath;
     }
-  });
+    return bin;
+  };
+
+  if ( typeof callback === 'function' ) {
+    app.talk( {
+      path: 'snapshot.cgi',
+      encoding: 'binary',
+      callback: async ( bin ) => {
+        try {
+          const result = await processData( bin );
+          callback( result );
+        }
+        catch ( err ) {
+          app.emit( 'connection-error', err );
+          callback( false );
+        }
+      }
+    } );
+    return undefined;
+  }
+
+  return app.talk( {
+    path: 'snapshot.cgi',
+    encoding: 'binary'
+  } ).then( processData );
 };
 
 
 // communicate
-app.talk = function (props) {
+app.talk = function( props ) {
+  const fields = props.fields || {};
+  fields.user = app.settings.user;
+  fields.pwd = app.settings.pass;
 
-  if (!props.fields) {
-    props.fields = {}
+  const queryParams = new URLSearchParams( fields ).toString();
+  const url = `http://${app.settings.host}:${app.settings.port}/${props.path}?${queryParams}`;
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch( url );
+
+      if ( !response.ok ) {
+        throw new Error( `HTTP error! status: ${response.status}` );
+      }
+
+      let data;
+      if ( props.encoding === 'binary' ) {
+        const buffer = await response.arrayBuffer();
+        data = Buffer.from( buffer );
+      }
+      else {
+        data = await response.text();
+        data = data.trim();
+      }
+
+      return data;
+    }
+    catch ( err ) {
+      app.emit( 'connection-error', err );
+      throw err;
+    }
+  };
+
+  if ( typeof props.callback === 'function' ) {
+    fetchData()
+      .then( ( data ) => props.callback( data ) )
+      .catch( () => {} );
+    return undefined;
   }
 
-  props.fields.user = app.settings.user;
-  props.fields.pwd = app.settings.pass;
-  path = '/'+ props.path +'?'+ querystring.stringify (props.fields);
-
-  // connect
-  var req = http.request ({
-    host: app.settings.host,
-    port: app.settings.port,
-    path: path,
-    method:   'GET'
-  }, function (response) {
-
-    // response
-    response.setEncoding (props.encoding || 'utf8');
-    var data = '';
-
-    response.on ('data', function (chunk) { data += chunk });
-    response.on ('end', function () {
-
-      if (typeof props.callback == 'function') {
-        data = data.trim ();
-        props.callback (data);
-      }
-    });
-  });
-
-  // fail
-  req.on ('error', function (err) {
-    app.emit ('connection-error', err);
-  });
-
-  // disconnect
-  req.end ();
+  return fetchData();
 };
 
 // ready
