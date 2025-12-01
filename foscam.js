@@ -17,7 +17,8 @@ app.settings = {
   host: '192.168.1.239',
   port: 81,
   user: 'admin',
-  pass: ''
+  pass: '',
+  timeout: 5000,
 };
 
 // overrides
@@ -443,10 +444,13 @@ app.talk = function( {
   const queryParams = new URLSearchParams( fields ).toString();
   const url = `http://${app.settings.host}:${app.settings.port}/${path}?${queryParams}`;
 
+  const options = {
+    timeout: AbortSignal.timeout( parseInt( timeout, 10 ) ),
+  }; 
 
   const fetchData = async () => {
     try {
-      const response = await fetch( url );
+      const response = await fetch( url, options );
 
       if ( !response.ok ) {
         throw new Error( `HTTP error! status: ${response.status}` );
