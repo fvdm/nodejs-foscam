@@ -1,6 +1,6 @@
 {
   "author": {
-    "name": "Franklin van de Meent",
+    "name": "Franklin",
     "email": "fr@nkl.in",
     "url": "https://frankl.in"
   },
@@ -17,10 +17,10 @@
   "main": "foscam.js",
   "dependencies": {},
   "devDependencies": {
-    "dotest": "^2.3.0"
+    "dotest": "^2"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=4"
   },
   "keywords": [
     "camera",
