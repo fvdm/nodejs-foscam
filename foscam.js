@@ -29,8 +29,6 @@ app.setup = function( props, cb ) {
   if ( typeof cb === 'function' ) {
     return app.status( cb );
   }
-
-  return undefined;
 };
 
 
@@ -103,7 +101,7 @@ app.status = function( cb ) {
       path: 'get_status.cgi',
       callback: ( data ) => cb( processData( data ) )
     } );
-    return undefined;
+    return;
   }
 
   return app.talk( { path: 'get_status.cgi' } ).then( processData );
@@ -126,7 +124,7 @@ app.camera_params = function( cb ) {
       path: 'get_camera_params.cgi',
       callback: ( data ) => cb( processData( data ) )
     } );
-    return undefined;
+    return;
   }
 
   return app.talk( { path: 'get_camera_params.cgi' } ).then( processData );
@@ -186,7 +184,7 @@ app.control = {
         fields: { command },
         callback: cb
       } );
-      return undefined;
+      return;
     }
 
     return app.talk( {
@@ -290,7 +288,7 @@ app.control = {
         },
         callback: cb
       } );
-      return undefined;
+      return;
     }
 
     return app.talk( {
@@ -311,7 +309,7 @@ app.reboot = function( cb ) {
       path: 'reboot.cgi',
       callback: cb
     } );
-    return undefined;
+    return;
   }
 
   return app.talk( { path: 'reboot.cgi' } );
@@ -325,7 +323,7 @@ app.restore_factory = function( cb ) {
       path: 'restore_factory.cgi',
       callback: cb
     } );
-    return undefined;
+    return;
   }
 
   return app.talk( { path: 'restore_factory.cgi' } );
@@ -339,7 +337,7 @@ app.params = function( cb ) {
       path: 'get_params.cgi',
       callback: cb
     } );
-    return undefined;
+    return;
   }
 
   return app.talk( { path: 'get_params.cgi' } );
@@ -357,7 +355,7 @@ app.set = {
         fields: { alias },
         callback: cb
       } );
-      return undefined;
+      return;
     }
 
     return app.talk( {
@@ -374,7 +372,7 @@ app.set = {
         fields: props,
         callback: cb
       } );
-      return undefined;
+      return;
     }
 
     return app.talk( {
@@ -418,7 +416,7 @@ app.snapshot = function( filepath, cb ) {
         }
       }
     } );
-    return undefined;
+    return;
   }
 
   return app.talk( {
@@ -465,11 +463,11 @@ app.talk = function( props ) {
 
   if ( typeof props.callback === 'function' ) {
     fetchData()
-      .then( ( data ) => props.callback( data ) )
-      .catch( ( err ) => {
+      .then( props.callback )
+      .catch( () => {
         // Error already emitted via 'connection-error' event in fetchData
       } );
-    return undefined;
+    return;
   }
 
   return fetchData();
