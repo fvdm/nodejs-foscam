@@ -115,7 +115,8 @@ app.camera_params = function( cb ) {
   const processData = ( data ) => {
     const result = {};
     data.replace( /var ([^=]+)=([^;]+);/g, ( str, key, value ) => {
-      result[key] = parseInt( value, 10 );
+      const parsed = parseInt( value, 10 );
+      result[key] = isNaN( parsed ) ? 0 : parsed;
     } );
     return result;
   };
@@ -396,7 +397,7 @@ app.snapshot = function( filepath, cb ) {
 
   const processData = async ( bin ) => {
     if ( savePath ) {
-      await fs.promises.writeFile( savePath, bin, 'binary' );
+      await fs.promises.writeFile( savePath, bin );
       return savePath;
     }
     return bin;
@@ -465,7 +466,9 @@ app.talk = function( props ) {
   if ( typeof props.callback === 'function' ) {
     fetchData()
       .then( ( data ) => props.callback( data ) )
-      .catch( () => {} );
+      .catch( ( err ) => {
+        // Error already emitted via 'connection-error' event in fetchData
+      } );
     return undefined;
   }
 
