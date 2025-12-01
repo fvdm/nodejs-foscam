@@ -464,8 +464,8 @@ app.talk = function( props ) {
   if ( typeof props.callback === 'function' ) {
     fetchData()
       .then( props.callback )
-      .catch( () => {
-        // Error already emitted via 'connection-error' event in fetchData
+      .catch( ( err ) => {
+        props.callback( err );
       } );
     return;
   }
