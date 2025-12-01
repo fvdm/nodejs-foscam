@@ -462,11 +462,7 @@ app.talk = function( props ) {
   };
 
   if ( typeof props.callback === 'function' ) {
-    fetchData()
-      .then( props.callback )
-      .catch( ( err ) => {
-        props.callback( err );
-      } );
+    fetchData().then( props.callback );
     return;
   }
 
