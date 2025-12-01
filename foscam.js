@@ -427,13 +427,22 @@ app.snapshot = function( filepath, cb ) {
 
 
 // communicate
-app.talk = function( props ) {
-  const fields = props.fields || {};
+app.talk = function( {
+
+  path,
+  fields = {},
+  encoding = '',
+  callback = false,
+  timeout = app.settings.timeout,
+ 
+} ) {
+
   fields.user = app.settings.user;
   fields.pwd = app.settings.pass;
 
   const queryParams = new URLSearchParams( fields ).toString();
-  const url = `http://${app.settings.host}:${app.settings.port}/${props.path}?${queryParams}`;
+  const url = `http://${app.settings.host}:${app.settings.port}/${path}?${queryParams}`;
+
 
   const fetchData = async () => {
     try {
@@ -444,7 +453,7 @@ app.talk = function( props ) {
       }
 
       let data;
-      if ( props.encoding === 'binary' ) {
+      if ( encoding === 'binary' ) {
         const buffer = await response.arrayBuffer();
         data = Buffer.from( buffer );
       }
@@ -461,12 +470,13 @@ app.talk = function( props ) {
     }
   };
 
-  if ( typeof props.callback === 'function' ) {
-    fetchData().then( props.callback );
+  if ( typeof callback === 'function' ) {
+    fetchData().then( callback );
     return;
   }
 
   return fetchData();
+ 
 };
 
 // ready
