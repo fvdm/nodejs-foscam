@@ -475,7 +475,7 @@ app.talk = function( {
   };
 
   if ( typeof callback === 'function' ) {
-    fetchData().then( callback );
+    fetchData().then( callback ).catch( () => {} );
     return;
   }
 
